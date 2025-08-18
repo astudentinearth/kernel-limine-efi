@@ -93,7 +93,7 @@ void draw_test() {
   }
 
   psf_init();
-  unsigned char msg[8] = {'H', 'E', 'L', 'L', 'O', '?', '?', '?'};
+  unsigned char msg[8] = {'H', 'e', 'l', 'l', 'o', '!', '?', '?'};
   for(int i = 0; i < 8; i++) {
     draw_char((i * 10)+64, 64, msg[i], 0x5555ff);
   }
