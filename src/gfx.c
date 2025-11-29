@@ -1,4 +1,4 @@
-#include <limine.h>
+#include "limine.h"
 #include <stdint.h>
 #include "psf.h"
 
@@ -36,17 +36,6 @@ void draw_line_h(int x, int delta) {}
 
 void draw_line_v(int y, int delta) {}
 
-uint8_t fake_glyph[16] = {
-    0b10000001,
-    0b01000010,
-    0b00111100,
-    0b00011000,
-    0b00011000,
-    0b00111100,
-    0b01000010,
-    0b10000001,
-    0,0,0,0,0,0,0,0
-};
 
 void draw_char(int x, int y, char c, uint32_t color) {
     uint32_t *cursor = framebuffer->address;
@@ -63,41 +52,6 @@ void draw_char(int x, int y, char c, uint32_t color) {
     }
 }
 
-void draw_test() {
-  uint32_t *cursor = framebuffer->address;
-
-  for (int i = 0; i < 32; i++) {
-    *cursor = 0xffffff;
-    cur_move(&cursor, 0, 1);
-  }
-
-  cur_setpos(&cursor, framebuffer->address,
-             cursor_get_x(cursor, framebuffer->address),
-             cursor_get_y(cursor, framebuffer->address));
-
-  for (int i = 0; i < 32; i++) {
-    *cursor = 0xffffff;
-    cur_move(&cursor, 1, 0);
-  }
-
-  for (int i = 0; i < 16; i++) {
-    *cursor = 0xffffff;
-    cur_move(&cursor, 1, 1);
-  }
-
-  cur_setpos(&cursor, framebuffer->address, 0, 0);
-
-  for (int i = 0; i < 16; i++) {
-    *cursor = 0x556cff;
-    cur_move(&cursor, 1, 1);
-  }
-
-  psf_init();
-  unsigned char msg[8] = {'H', 'e', 'l', 'l', 'o', '!', '?', '?'};
-  for(int i = 0; i < 8; i++) {
-    draw_char((i * 10)+64, 64, msg[i], 0x5555ff);
-  }
-
+void gfx_init(){
+    psf_init();
 }
-
-

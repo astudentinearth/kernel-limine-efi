@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include "mem.h"
 #include "gfx.h"
+#include "debug.h"
 
 __attribute__((used, section(".limine_requests")))
 static volatile LIMINE_BASE_REVISION(3);
@@ -44,8 +45,9 @@ void kmain(void) {
     // Fetch the first framebuffer.
     struct limine_framebuffer *framebuffer = get_framebuffer(0);
     set_framebuffer(framebuffer);
-    draw_test();
-
+    gfx_init();
+    debug("Hello world!");
+    draw_char(0, 0, 'A', 0xffffffff);
     // We're done, just hang...
     hcf();
 }
