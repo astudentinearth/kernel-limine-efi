@@ -1,25 +1,10 @@
 #pragma once
-#include <cpuid.h>
-#include "../mem.h"
+#include <stdbool.h>
 
-static inline char cpu_model[13];
-static inline bool cpuid_initialized = false;
+extern char cpu_model[13];
+extern bool cpuid_initialized;
 
-static inline char* get_cpu_model_string() {
-    if(cpuid_initialized) return cpu_model;
-    int eax, ebx, edx, ecx;
-    __cpuid(0, eax, ebx, ecx, edx);
+char* get_cpu_model_string();
 
-    memcpy(cpu_model, &ebx, 4);
-    memcpy(&(cpu_model[4]), &edx, 4);
-    memcpy(&(cpu_model[8]), &ecx, 4);
-    return cpu_model;
-}
-
-static inline void debug_print_cpu_model() {
-    char* model = get_cpu_model_string();
-    debug_puts("CPU model:");
-    debug_puts(model);
-    debug_puts("\n");
-}
+void debug_print_cpu_model(); 
 

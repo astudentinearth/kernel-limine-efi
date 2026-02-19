@@ -1,2 +1,2 @@
 CompileFlags:
-  Add: ["-DTEST_MODE"]
+  Add: ["-DTEST_MODE", -nostdlibinc, -ffreestanding]
