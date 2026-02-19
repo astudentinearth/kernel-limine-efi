@@ -12,8 +12,10 @@ CC := x86_64-elf-gcc
 # User controllable linker command.
 LD := x86_64-elf-ld
 
+OBJCOPY := x86_64-elf-objcopy
+
 # User controllable C flags.
-CFLAGS := -g -O2 -pipe
+CFLAGS := -g -O2 -pipe -DTEST_MODE
 
 # User controllable C preprocessor flags. We set none by default.
 CPPFLAGS :=
@@ -51,6 +53,7 @@ override CFLAGS += \
     -mno-sse2 \
     -mno-red-zone \
     -mcmodel=kernel
+
 
 # Internal C preprocessor flags that should not be changed by the user.
 override CPPFLAGS := \
@@ -100,7 +103,7 @@ obj/%.c.o: src/%.c GNUmakefile
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 obj/font.o: src/font.psf GNUmakefile
-	objcopy -O elf64-x86-64 -B i386 -I binary src/font.psf obj/font.o
+	$(OBJCOPY) -O elf64-x86-64 -B i386 -I binary src/font.psf obj/font.o
 
 # Compilation rules for *.S files.
 obj/%.S.o: src/%.S GNUmakefile
@@ -111,6 +114,7 @@ obj/%.S.o: src/%.S GNUmakefile
 obj/%.asm.o: src/%.asm GNUmakefile
 	mkdir -p "$$(dirname $@)"
 	nasm $(NASMFLAGS) $< -o $@
+
 
 # Remove object files and the final executable.
 .PHONY: clean

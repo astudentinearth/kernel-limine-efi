@@ -1,3 +1,4 @@
+#pragma once
 #define COM1 0x3f8
 #include <stdint.h>
 

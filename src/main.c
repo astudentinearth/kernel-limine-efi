@@ -1,9 +1,10 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include "debug.h"
 #include "mem.h"
 #include "gfx.h"
-#include "debug.h"
+#include "test.h"
 
 __attribute__((used, section(".limine_requests")))
 static volatile LIMINE_BASE_REVISION(3);
@@ -42,12 +43,20 @@ void kmain(void) {
         hcf();
     }
 
+    
+
     // Fetch the first framebuffer.
     struct limine_framebuffer *framebuffer = get_framebuffer(0);
     set_framebuffer(framebuffer);
     gfx_init();
     debug("Hello world!");
     draw_char(0, 0, 'A', 0xffffffff);
+
+    #ifdef TEST_MODE
+    debug("Running in test mode");
+    run_tests();
+    #endif
+
     // We're done, just hang...
     hcf();
 }

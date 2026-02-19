@@ -1,3 +1,4 @@
+#pragma once
 #include "serial.h"
 
 inline void debug(const char* msg) {
