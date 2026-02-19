@@ -7,10 +7,10 @@ MAKEFLAGS += -rR
 override OUTPUT := myos
 
 # User controllable C compiler command.
-CC := cc
+CC := x86_64-elf-gcc
 
 # User controllable linker command.
-LD := ld
+LD := x86_64-elf-ld
 
 # User controllable C flags.
 CFLAGS := -g -O2 -pipe

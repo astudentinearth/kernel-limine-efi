@@ -3,3 +3,4 @@ image.iso
 limine/
 iso_root
 obj
+.DS_Store
