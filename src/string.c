@@ -34,6 +34,33 @@ void itoa(int64_t num, char *buf){
 
 }
 
+void itoa_hex(uint64_t num, char *buf) {
+
+    if(num == 0) {
+        buf[0] = '0';
+        return;
+    }
+
+    int digit_count = 0;
+    char* cur = buf;
+
+    // convert to digits in reverse
+    while(num > 0) {
+        uint64_t remainder = num % 16;
+        num /= 16;
+        *cur++ = digit_to_ascii(remainder);
+        digit_count++;
+    }
+
+    char* seq = buf;
+
+    for(int i = 0; i < digit_count / 2; i++) {
+        char b = seq[digit_count - 1 - i];
+        seq[digit_count - 1 - i] = seq[i];
+        seq[i] = b;
+    }
+}
+
 bool strcmp(const char *a, const char *b) {
     while(*a != 0 || *b != 0) {
         if(*a++ != *b++) return false;
