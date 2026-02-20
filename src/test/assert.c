@@ -14,7 +14,7 @@ bool assert(bool actual, const char *label) {
 }
 
 bool assert_equals_str(const char *expected, const char *actual, const char *label) {
-    bool success = strcmp(expected, actual);
+    bool success = str_equals(expected, actual);
     if(!success) {
         debug_puts("[FAIL] Assertion failed (");
         debug_puts(label);

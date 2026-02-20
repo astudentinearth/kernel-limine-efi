@@ -61,7 +61,7 @@ void itoa_hex(uint64_t num, char *buf) {
     }
 }
 
-bool strcmp(const char *a, const char *b) {
+bool str_equals(const char *a, const char *b) {
     while(*a != 0 || *b != 0) {
         if(*a++ != *b++) return false;
     }
