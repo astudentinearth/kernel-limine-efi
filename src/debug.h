@@ -3,6 +3,7 @@
 #include "mem.h"
 #include "math.h"
 #include "ascii.h"
+#include "string.h"
 
 /**
  * Pushes a debug message into COM1 port. Ends it with a newline.
@@ -26,15 +27,7 @@ static inline void debug_puts(const char* msg) {
 
 #define DEBUG_ITOA_BUFFER_SIZE 256
 
-// temporary buffer to print out numbers in debug
-static char debug_itoa_buffer[DEBUG_ITOA_BUFFER_SIZE];
-
-static inline void debug_reset_itoa_buffer() {
-    memset(debug_itoa_buffer, 0, DEBUG_ITOA_BUFFER_SIZE);
-}
-
-static inline void debug_itoa(int64_t num) {
-    debug_reset_itoa_buffer();
+static inline void debug_itoa(int64_t num, char* debug_itoa_buffer) {
     
     if(num == 0) {
         debug_itoa_buffer[0] = '0';
@@ -64,8 +57,6 @@ static inline void debug_itoa(int64_t num) {
     
 } 
 
-static inline void debug_put_int(int64_t num) {
-    debug_itoa(num);
-    debug_puts(debug_itoa_buffer);
-}
+void debug_put_int(int64_t num);
+
 
