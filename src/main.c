@@ -2,9 +2,9 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include "debug.h"
-#include "mem.h"
 #include "gfx.h"
 #include "test.h"
+#include "gdt.h"
 
 __attribute__((used, section(".limine_requests")))
 static volatile LIMINE_BASE_REVISION(3);
@@ -56,6 +56,10 @@ void kmain(void) {
     debug("Running in test mode");
     run_tests();
     #endif
+
+    debug("!!! Loading GDT");
+    setup_gdt();
+    debug("If you didn't triple fault here congrats");
 
     // We're done, just hang...
     hcf();
