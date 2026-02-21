@@ -1,5 +1,5 @@
 #pragma once
-#include "serial.h"
+#include "hardware/serial.h"
 #include "mem.h"
 #include "math.h"
 #include "ascii.h"

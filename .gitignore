@@ -4,3 +4,5 @@ limine/
 iso_root
 obj
 .DS_Store
+.cache
+compile_commands.json

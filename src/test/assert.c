@@ -1,6 +1,6 @@
 #ifdef TEST_MODE
-#include "assert.h"
-#include "../debug.h"
+#include "test/assert.h"
+#include "debug.h"
 
 
 

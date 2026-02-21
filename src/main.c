@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include "debug.h"
 #include "gfx.h"
-#include "test.h"
+#include "test/test.h"
 #include "gdt.h"
 
 __attribute__((used, section(".limine_requests")))
