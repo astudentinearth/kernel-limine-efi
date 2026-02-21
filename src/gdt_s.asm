@@ -7,8 +7,6 @@ gdtr DW 0 ; limit
 section .text
 global set_gdt
 
-.reload_segments:
-    
 
 set_gdt:
     cli

@@ -1,5 +1,6 @@
 
 #include "gdt.h"
+#include "debug.h"
 #include <stdint.h>
 
 extern void set_gdt(uint16_t limit, uint64_t base);
@@ -21,7 +22,7 @@ void setup_gdt() {
 
     tss.iopb = sizeof(struct TSS);
 
-    uint8_t *kernel_stack_start = kernel_stack_start + RSP0_SIZE;
+    uint8_t *kernel_stack_start = kernel_stack + RSP0_SIZE;
     uint8_t *ist1_stact_start = ist1_stack + IST1_SIZE;
     
 
@@ -40,5 +41,17 @@ void setup_gdt() {
     gdt.ssd = ssd;
 
     set_gdt(sizeof(struct GDT), (uint64_t)&gdt);
+    
+#ifdef TEST_MODE
+    debug("####\nGDT set.");
+    debug_puts("Kernel stack address: 0x");
+    debug_put_hex((uint64_t)kernel_stack);
+    debug_puts("\nIST1 stack address: 0x");
+    debug_put_hex((uint64_t)ist1_stack);
+    debug_puts("\nGDT address: 0x");
+    debug_put_hex((uint64_t)&gdt);
+    debug("\n####");
+#endif
+
 }
 

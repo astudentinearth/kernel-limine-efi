@@ -10,6 +10,8 @@ void setup_gdt();
 #define USER_DATA           0x00CFF2000000FFFF
 #define USER_CODE           0x00AFFA000000FFFF
 
+#define KERNEL_CODE_SEGMENT_OFFSET 0x08
+
 #define RSP0_SIZE 16384
 #define IST1_SIZE 4096
 

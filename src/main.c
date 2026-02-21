@@ -5,6 +5,7 @@
 #include "gfx.h"
 #include "test/test.h"
 #include "gdt.h"
+#include "idt.h"
 
 __attribute__((used, section(".limine_requests")))
 static volatile LIMINE_BASE_REVISION(3);
@@ -59,6 +60,7 @@ void kmain(void) {
 
     debug("!!! Loading GDT");
     setup_gdt();
+    setup_idt();
     debug("If you didn't triple fault here congrats");
 
     // We're done, just hang...
