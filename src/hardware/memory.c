@@ -7,21 +7,54 @@
 static struct limine_memmap_entry **memmap_entries;
 static uint64_t memmap_entry_count;
 static bool memmap_initialized = false;
+static void* largest_memory_block_start;
+static uint64_t largest_memory_block_size;
 
 void init_memory_map() {
     struct limine_memmap_response *memmap_response = get_limine_memmap();
     memmap_entry_count = memmap_response->entry_count;
     memmap_entries = memmap_response->entries;
+
+    struct limine_memmap_entry* largest = memmap_entries[0];
+    for(uint64_t i = 1; i < memmap_entry_count; i++) {
+        struct limine_memmap_entry* current = memmap_entries[i];
+        if(current->type != LIMINE_MEMMAP_USABLE) continue;
+        if(current->length > largest->length) {
+            largest = current;
+        }
+    }
+
+    if(largest->type != LIMINE_MEMMAP_USABLE) {
+        panic("No suitable memory block for data.");
+    }
+   
+
+    largest_memory_block_start = (void*)largest->base;
+    largest_memory_block_size = largest->length;
+
     memmap_initialized = true;
 }
 
-uint64_t get_usable_memory() { 
+uint64_t get_usable_memory() {
+    if(!memmap_initialized) init_memory_map();
     uint64_t result = 0;
     for(uint64_t i = 0; i < memmap_entry_count; i++) {
         if(memmap_entries[i]->type != LIMINE_MEMMAP_USABLE) continue;
         result += memmap_entries[i]->length;
     }
     return result;
+}
+
+void* get_largest_usable_memory_block() {
+    if(memmap_initialized) return largest_memory_block_start;
+    init_memory_map();
+    return largest_memory_block_start;
+}
+
+uint64_t get_largest_usable_memory_block_size() {
+    if(memmap_initialized) return largest_memory_block_size;
+    init_memory_map();
+    return largest_memory_block_size;
 }
 
 #ifdef TEST_MODE
@@ -69,6 +102,7 @@ static void dump_memory_entry(struct limine_memmap_entry* entry) {
 }
 
 void dump_memory_info() {
+    if(!memmap_initialized) init_memory_map();
     uint64_t usable_memory = get_usable_memory();
 
     debug("[[[ BEGIN MEMORY INFO ]]]]");

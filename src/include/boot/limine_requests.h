@@ -1,4 +1,4 @@
-
+#pragma once
 #include "limine.h"
 #include <stdbool.h>
 #include <stdint.h>

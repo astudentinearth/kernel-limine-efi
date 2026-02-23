@@ -1,6 +1,7 @@
 #include "hardware/cpu.h"
 #include <cpuid.h>
 #include "debug.h"
+#include "mem.h"
 
 char cpu_model[13];
 bool cpuid_initialized = false;

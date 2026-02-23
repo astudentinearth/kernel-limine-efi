@@ -8,6 +8,7 @@
 #include "idt.h"
 #include "boot/limine_requests.h"
 #include "hardware/memory.h"
+#include "hardware/allocator.h"
 
 static void hcf(void) {
     for (;;) {
@@ -31,6 +32,7 @@ void kmain(void) {
     setup_idt();
     set_framebuffer(framebuffer);
     gfx_init();
+    init_pmm();
     debug("If you didn't triple fault here congrats");
 
 
@@ -38,7 +40,8 @@ void kmain(void) {
     debug("Running in test mode");
     run_tests();
     dump_memory_info();
-    draw_char(0, 0, 'A', 0xffffffff);
+    draw_char(16, 16, 'A', 0xffffffff);
+    run_out_of_memory();
     #endif
 
 

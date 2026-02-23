@@ -1,6 +1,7 @@
 #ifdef TEST_MODE
 #include "test/assert.h"
 #include "debug.h"
+#include "string.h"
 
 
 

@@ -41,3 +41,9 @@ void debug_newline() {
     debug_puts("\n");
 }
 
+void panic(const char *message) {
+    debug("CRASHED");
+    debug(message);
+    asm ("cli; hlt");
+}
+
