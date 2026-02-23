@@ -38,6 +38,7 @@ void setup_idt() {
   load_idt(limit, base);
 #ifdef TEST_MODE
     debug("IDT set");
-    debug_put_int(limit / 0);
+    /*volatile int zero = 0;
+    debug_put_int(limit / zero); */
 #endif
 }

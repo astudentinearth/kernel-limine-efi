@@ -12,5 +12,6 @@ void debug_put_hex(uint64_t num) {
     char debug_itoa_buffer[DEBUG_ITOA_BUFFER_SIZE];
     memset(debug_itoa_buffer, 0, DEBUG_ITOA_BUFFER_SIZE);
     itoa_hex(num, debug_itoa_buffer);
+    debug_puts("0x");
     debug_puts(debug_itoa_buffer);
 }
