@@ -1,12 +1,20 @@
 #include "limine.h"
 #include <stdint.h>
 #include "psf.h"
+#include "debug.h"
 
 static struct limine_framebuffer *framebuffer;
 
 #define FB_WIDTH (framebuffer->pitch / 4)
 
-void set_framebuffer(struct limine_framebuffer *buf) { framebuffer = buf; }
+void set_framebuffer(struct limine_framebuffer *buf) { 
+    framebuffer = buf; 
+#ifdef TEST_MODE
+    debug_puts("[Framebuffer address: ");
+    debug_put_hex((uint64_t)framebuffer->address);
+    debug_puts("]\n");
+#endif
+}
 
 uint32_t *cur_move(uint32_t **cur, int delta_x, int delta_y) {
   *cur += (delta_y * FB_WIDTH + delta_x);

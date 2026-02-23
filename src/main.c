@@ -23,15 +23,14 @@ void kmain(void) {
 
     // Fetch the first framebuffer.
     struct limine_framebuffer *framebuffer = get_limine_framebuffer(0);
-    set_framebuffer(framebuffer);
-    gfx_init();
     init_memory_map();
     debug("Hello world!");
-    draw_char(0, 0, 'A', 0xffffffff);
 
     debug("!!! Loading GDT");
     setup_gdt();
     setup_idt();
+    set_framebuffer(framebuffer);
+    gfx_init();
     debug("If you didn't triple fault here congrats");
 
 
@@ -39,6 +38,7 @@ void kmain(void) {
     debug("Running in test mode");
     run_tests();
     dump_memory_info();
+    draw_char(0, 0, 'A', 0xffffffff);
     #endif
 
 
