@@ -7,6 +7,7 @@
 #include "gdt.h"
 #include "idt.h"
 #include "boot/limine_requests.h"
+#include "hardware/memory.h"
 
 static void hcf(void) {
     for (;;) {
@@ -24,18 +25,22 @@ void kmain(void) {
     struct limine_framebuffer *framebuffer = get_limine_framebuffer(0);
     set_framebuffer(framebuffer);
     gfx_init();
+    init_memory_map();
     debug("Hello world!");
     draw_char(0, 0, 'A', 0xffffffff);
-
-    #ifdef TEST_MODE
-    debug("Running in test mode");
-    run_tests();
-    #endif
 
     debug("!!! Loading GDT");
     setup_gdt();
     setup_idt();
     debug("If you didn't triple fault here congrats");
+
+
+    #ifdef TEST_MODE
+    debug("Running in test mode");
+    run_tests();
+    dump_memory_info();
+    #endif
+
 
     // We're done, just hang...
     hcf();
