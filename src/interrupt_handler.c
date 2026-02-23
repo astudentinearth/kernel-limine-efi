@@ -25,25 +25,10 @@ static inline void dump_frame(struct interrupt_frame *frame) {
 }
 
 __attribute__((noreturn))
-void exception_handler(struct interrupt_frame *frame);
-void exception_handler(struct interrupt_frame *frame) {
-    dump_frame(frame);
-    __asm__ volatile ("cli; hlt");
-}
-
-__attribute__((noreturn))
-void handle_divide_error(struct interrupt_frame *frame);
-void handle_divide_error(struct interrupt_frame *frame) {
-    debug("Unhandled division error. Halting");
-    dump_frame(frame);
-    __asm__ volatile ("cli; hlt");
-}
-
-__attribute__((noreturn))
 void handle_interrupt(struct interrupt_frame *frame, uint64_t interrupt_code);
 void handle_interrupt(struct interrupt_frame *frame, uint64_t interrupt_code) {
 #ifdef TEST_MODE
-    debug_puts("[!] Unhandled error - code ");
+    debug_puts("[!] Interrupt - code ");
     debug_put_hex(interrupt_code);
     debug_puts("\n");
 #endif
@@ -54,6 +39,16 @@ void handle_interrupt(struct interrupt_frame *frame, uint64_t interrupt_code) {
 __attribute__((noreturn))
 void handle_interrupt_with_error_code(struct interrupt_frame *frame, uint64_t interrupt_code, uint64_t error_code);
 void handle_interrupt_with_error_code(struct interrupt_frame *frame, uint64_t interrupt_code, uint64_t error_code) {
+
+#ifdef TEST_MODE
+    debug_puts("[!] Interrupt - code ");
+    debug_put_hex(interrupt_code);
+    debug_puts("\n");
+    debug_puts("[!] Error code provided: ");
+    debug_put_hex(error_code);
+    debug_puts("\n");
+#endif
+    dump_frame(frame);
     __asm__ volatile ("cli; hlt");
 }
 

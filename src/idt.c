@@ -6,6 +6,7 @@
 
 extern void load_idt(uint16_t size, uint64_t offset);
 extern void *isr_stub_table[];
+extern void trigger_gp();
 
 static bool vectors[IDT_MAX_DESCRIPTORS];
 
@@ -38,7 +39,6 @@ void setup_idt() {
   load_idt(limit, base);
 #ifdef TEST_MODE
     debug("IDT set");
-    /*volatile int zero = 0;
-    debug_put_int(limit / zero); */
+    trigger_gp();
 #endif
 }

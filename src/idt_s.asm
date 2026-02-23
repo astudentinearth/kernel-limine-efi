@@ -5,13 +5,15 @@ idtr dw 0 ; size
 
 section .text
 
-extern exception_handler
 extern handle_interrupt
+extern handle_interrupt_with_error_code
 
 %macro isr_err_stub 1
 isr_stub_%+%1:
+    pop rdx
     mov rdi, rsp
-    call exception_handler
+    mov rsi, %1
+    call handle_interrupt_with_error_code
     pop rdi
     iretq
 %endmacro
