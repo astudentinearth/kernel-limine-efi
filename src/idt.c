@@ -39,6 +39,5 @@ void setup_idt() {
   load_idt(limit, base);
 #ifdef TEST_MODE
     debug("IDT set");
-    trigger_gp();
 #endif
 }

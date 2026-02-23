@@ -24,24 +24,23 @@ struct interrupt_frame {
     uword_t ss;
 };
 
-struct IDT {
-    struct InterruptDescriptor64 divide_error;
-    struct InterruptDescriptor64 debug_exception;
-    struct InterruptDescriptor64 nmi_interrupt;
-    struct InterruptDescriptor64 breakpoint;
-    struct InterruptDescriptor64 overflow;
-    struct InterruptDescriptor64 bound_range_exceeded;
-    struct InterruptDescriptor64 invalid_opcode;
-    struct InterruptDescriptor64 device_not_available;
-    struct InterruptDescriptor64 double_fault;
-    struct InterruptDescriptor64 coprocessor_segment_overrun;
-    struct InterruptDescriptor64 invalid_tss;
-    struct InterruptDescriptor64 segment_not_present;
-    struct InterruptDescriptor64 stack_segment_fault;
-    struct InterruptDescriptor64 general_protection_fault;
-    struct InterruptDescriptor64 page_fault;
-}__attribute__((packed));
 
 void setup_idt();
+
+#define INT_DIVIDE_ERROR 0X00
+#define INT_DEBUG_EXCEPTION 0X01
+#define INT_NMI_INTERRUPT 0X02
+#define INT_BREAKPOINT 0X03
+#define INT_OVERFLOW 0X04
+#define INT_BOUND 0X05
+#define INT_INVALID_OPCODE 0X06
+#define INT_DEVICE_NOT_AVAILABLE 0X07
+#define INT_DOUBLE_FAULT 0X08
+#define INT_COPROCESSOR_SEGMENT_OVERRUN 0x09
+#define INT_INVALID_TSS 0X0A
+#define INT_SEGMENT_NOT_PRESENT 0X0B
+#define INT_STACK_SEGMENT_FAULT 0X0C
+#define INT_GENERAL_PROTECTION_FAULT 0X0D
+#define INT_PAGE_FAULT 0x0E
 
 

@@ -6,25 +6,7 @@
 #include "test/test.h"
 #include "gdt.h"
 #include "idt.h"
-
-__attribute__((used, section(".limine_requests")))
-static volatile LIMINE_BASE_REVISION(3);
-
-__attribute__((used, section(".limine_requests")))
-static volatile struct limine_framebuffer_request framebuffer_request = {
-    .id = LIMINE_FRAMEBUFFER_REQUEST,
-    .revision = 0
-};
-
-__attribute__((used, section(".limine_requests_start")))
-static volatile LIMINE_REQUESTS_START_MARKER;
-
-__attribute__((used, section(".limine_requests_end")))
-static volatile LIMINE_REQUESTS_END_MARKER;
-
-inline struct limine_framebuffer* get_framebuffer(int i) {
-    return framebuffer_request.response->framebuffers[i];
-}
+#include "boot/limine_requests.h"
 
 static void hcf(void) {
     for (;;) {
@@ -34,20 +16,12 @@ static void hcf(void) {
 
 void kmain(void) {
     // Ensure the bootloader actually understands our base revision (see spec).
-    if (LIMINE_BASE_REVISION_SUPPORTED == false) {
+    if (!is_base_revision_supported() || !limine_framebuffer_available()) {
         hcf();
     }
-
-    // Ensure we got a framebuffer.
-    if (framebuffer_request.response == NULL
-     || framebuffer_request.response->framebuffer_count < 1) {
-        hcf();
-    }
-
-    
 
     // Fetch the first framebuffer.
-    struct limine_framebuffer *framebuffer = get_framebuffer(0);
+    struct limine_framebuffer *framebuffer = get_limine_framebuffer(0);
     set_framebuffer(framebuffer);
     gfx_init();
     debug("Hello world!");
