@@ -14,6 +14,14 @@ bool assert(bool actual, const char *label) {
     return actual;
 }
 
+bool assert_equals_uint(uint64_t expected, uint64_t actual, const char *label) {
+    if(expected != actual) {
+        debug_printf("[FAIL] Assertion failed | Expected: %u | Actual: %u (%s)\n", expected, actual, label);
+        return false;
+    }
+    return true;
+}
+
 bool assert_equals_str(const char *expected, const char *actual, const char *label) {
     bool success = str_equals(expected, actual);
     if(!success) {
