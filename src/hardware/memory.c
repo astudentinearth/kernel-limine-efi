@@ -60,11 +60,9 @@ uint64_t get_largest_usable_memory_block_size() {
 #ifdef TEST_MODE
 static void dump_memory_entry(struct limine_memmap_entry* entry) {
     debug("Memory entry: ");
-    debug_puts("    Start address: ");
-    debug_put_hex(entry->base);
-    debug_puts("\n    Length: ");
-    debug_put_uint(entry->length);
-    debug_puts("\n    Type: ");
+    debug_printf("    Start address: %p\n", entry->base);
+    debug_printf("    Length: %p\n", entry->length);
+    debug_puts("    Type: ");
     switch(entry->type) {
         case LIMINE_MEMMAP_USABLE:
             debug_puts("USABLE");
@@ -106,9 +104,7 @@ void dump_memory_info() {
     uint64_t usable_memory = get_usable_memory();
 
     debug("[[[ BEGIN MEMORY INFO ]]]]");
-    debug_puts("Usable memory: ");
-    debug_put_uint(usable_memory);
-    debug_puts(" bytes \n");
+    debug_printf("Usable memory: %u bytes \n", usable_memory);
     
     for(uint64_t i = 0; i < memmap_entry_count; i++) {
         dump_memory_entry(memmap_entries[i]);

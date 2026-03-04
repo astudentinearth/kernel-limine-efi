@@ -67,6 +67,7 @@ void debug_printf(const char* msg, ...) {
                     debug_put_uint(va_arg(args, uint64_t));
                     continue;
 
+                case 'p':
                 case 'x': //TODO: implement lowercase later
                 case 'X':
                     debug_put_hex(va_arg(args, uint64_t));

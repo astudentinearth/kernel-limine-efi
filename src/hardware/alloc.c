@@ -76,8 +76,7 @@ void test_allocator() {
     pass &= assert(frame_map[i2] == FREE, "frame 2 free");
     pass &= assert(frame_map[i3] == FREE, "frame 3 free");
     pass &= assert(frame_map[i4] == FREE, "frame 4 free");
-    debug_printf("[TEST] page frame allocator test %s", pass ? "pass" : "fail");
-    debug(pass ? "[TEST] page frame allocator test pass" : "[TEST] page frame allocator test fail");
+    debug_printf("[TEST] page frame allocator test %s\n", pass ? "pass" : "fail");
 }
 #endif
 

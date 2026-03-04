@@ -9,6 +9,7 @@
 #include "boot/limine_requests.h"
 #include "hardware/memory.h"
 #include "hardware/allocator.h"
+#include "hardware/pic.h"
 
 static void hcf(void) {
     for (;;) {
@@ -33,6 +34,7 @@ void kmain(void) {
     set_framebuffer(framebuffer);
     gfx_init();
     init_pmm();
+    check_apic();
     debug("If you didn't triple fault here congrats");
 
 
