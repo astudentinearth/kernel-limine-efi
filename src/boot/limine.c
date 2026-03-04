@@ -3,6 +3,9 @@
 #include "boot/limine_requests.h"
 #include <stddef.h>
 
+__attribute__((used, section(".limine_requests_start")))
+static volatile LIMINE_REQUESTS_START_MARKER;
+
 __attribute__((used, section(".limine_requests")))
 static volatile LIMINE_BASE_REVISION(3);
 
@@ -18,8 +21,18 @@ static volatile struct limine_memmap_request memmap_request = {
     .revision = 0
 };
 
-__attribute__((used, section(".limine_requests_start")))
-static volatile LIMINE_REQUESTS_START_MARKER;
+__attribute__((used, section(".limine_requests")))
+static volatile struct limine_hhdm_request hhdm_request = {
+    .id= LIMINE_HHDM_REQUEST,
+    .revision = 0
+};
+
+
+__attribute__((used, section(".limine_requests")))
+static volatile struct limine_executable_address_request executable_address_request = {
+    .id = LIMINE_EXECUTABLE_ADDRESS_REQUEST,
+    .revision = 0
+};
 
 __attribute__((used, section(".limine_requests_end")))
 static volatile LIMINE_REQUESTS_END_MARKER;
@@ -34,6 +47,21 @@ struct limine_framebuffer* get_limine_framebuffer(int i) {
 
 uint64_t get_framebuffer_count() {
     return framebuffer_request.response->framebuffer_count;
+}
+
+uint64_t get_hhdm_offset() {
+    struct limine_hhdm_response* response = hhdm_request.response;
+    return response->offset;
+}
+
+uint64_t get_physical_executable_base() {
+    struct limine_executable_address_response* response = executable_address_request.response;
+    return response->physical_base;
+}
+
+uint64_t get_virtual_executable_base() {
+    struct limine_executable_address_response* response = executable_address_request.response;
+    return response->virtual_base;
 }
 
 struct limine_memmap_response* get_limine_memmap() {

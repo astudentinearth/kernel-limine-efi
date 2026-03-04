@@ -107,6 +107,10 @@ void dump_memory_info() {
         dump_memory_entry(memmap_entries[i]);
     }
 
+    debug_printf("---\n");
+    debug_printf("Kernel address | Physical: %p | Virtual: %p\n", get_physical_executable_base(), get_virtual_executable_base());
+    debug_printf("HHDM offset: %p\n", get_hhdm_offset());
+    debug_printf("---\n");
     debug_puts("\n[[[ END MEMORY INFO ]]]\n");
 }
 #endif
