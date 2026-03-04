@@ -13,8 +13,6 @@ static uint64_t max_available_pages;
 static uint64_t total_allocated = 0;
 static uint64_t total = 0;
 
-
-
 pageframe_t kalloc_frame(){
     uint64_t i = 0;
     while(frame_map[i] != FREE) {
@@ -28,8 +26,13 @@ pageframe_t kalloc_frame(){
     return pool_ptr + (i * PAGE_SIZE);
 }
 
-void kfree_frame(pageframe_t pframe) {
+uint64_t get_frame_idx(pageframe_t pframe) {
+    return (pframe - pool_ptr) / PAGE_SIZE;
+}
 
+void kfree_frame(pageframe_t pframe) {
+    uint64_t index = get_frame_idx(pframe);
+    frame_map[index] = FREE;
 }
 
 void init_pmm() {
@@ -42,27 +45,46 @@ void init_pmm() {
 }
 
 #ifdef TEST_MODE
-void run_out_of_memory() {
-    debug_puts(">> Pool start: ");
-    debug_put_hex(pool_ptr);
-    debug_puts("\nExpected pool end: ");
-    debug_put_hex(pool_ptr + total);
-    debug_puts("\nMax available pages:: ");
-    debug_put_uint(max_available_pages);
-    for(uint64_t i = 0; i < max_available_pages; i++) {
-        pageframe_t ptr = kalloc_frame();
-        if(i % 1000 == 0) {
-            debug_puts("\n>> Total allocated bytes: ");
-            debug_put_uint(total_allocated);
-            debug_puts("\n>> Last frame address: ");
-            debug_put_hex(ptr);
-        }
-    }
-    debug("\n[!] Allocated all pages. We should now crash.");
-    kalloc_frame();
-    kalloc_frame();
-    kalloc_frame();
-    kalloc_frame();
+#include "test/assert.h"
+void test_allocator() {
+    debug("[TEST] page frame allocator test begin");
+    bool pass = true;
+    pageframe_t p1, p2, p3, p4;
+    p1 = kalloc_frame();
+    p2 = kalloc_frame();
+    p3 = kalloc_frame();
+    p4 = kalloc_frame();
+    debug_puts("Allocated frames: ");
+    debug_put_hex(p1);
+    debug_puts(" ");
+    debug_put_hex(p2);
+    debug_puts(" ");
+    debug_put_hex(p3);
+    debug_puts(" ");
+    debug_put_hex(p4);
+    debug_newline();
+    uint64_t i1, i2, i3, i4;
+    i1 = get_frame_idx(p1);
+    i2 = get_frame_idx(p2);
+    i3 = get_frame_idx(p3);
+    i4 = get_frame_idx(p4);
+
+    pass &= assert(frame_map[i1] == USED, "frame 1 used");
+    pass &= assert(frame_map[i2] == USED, "frame 2 used");
+    pass &=assert(frame_map[i3] == USED, "frame 3 used");
+    pass &=assert(frame_map[i4] == USED, "frame 4 used");
+
+    debug("Freeing frames");
+    kfree_frame(p1);
+    kfree_frame(p2);
+    kfree_frame(p3);
+    kfree_frame(p4);
+
+    pass &= assert(frame_map[i1] == FREE, "frame 1 free");
+    pass &= assert(frame_map[i2] == FREE, "frame 2 free");
+    pass &= assert(frame_map[i3] == FREE, "frame 3 free");
+    pass &= assert(frame_map[i4] == FREE, "frame 4 free");
+    debug(pass ? "[TEST] page frame allocator test pass" : "[TEST] page frame allocator test fail");
 }
 #endif
 

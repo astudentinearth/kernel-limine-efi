@@ -41,7 +41,7 @@ void kmain(void) {
     run_tests();
     dump_memory_info();
     draw_char(16, 16, 'A', 0xffffffff);
-    run_out_of_memory();
+    test_allocator();
     #endif
 
 

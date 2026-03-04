@@ -11,6 +11,6 @@ void kfree_frame(pageframe_t);
 void init_pmm();
 
 #ifdef TEST_MODE
-void run_out_of_memory();
+void test_allocator();
 #endif
 
