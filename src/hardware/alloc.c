@@ -3,12 +3,14 @@
 #include "hardware/allocator.h"
 #include "hardware/memory.h"
 #include <stdbool.h>
+#include <stdint.h>
 
 #define USED true
 #define FREE false
 
 static bool frame_map[MAX_PAGE_COUNT];
 static uint64_t pool_ptr;
+static uint64_t pool_end_ptr;
 static uint64_t max_available_pages;
 static uint64_t total_allocated = 0;
 static uint64_t total = 0;
@@ -36,11 +38,35 @@ void kfree_frame(pageframe_t pframe) {
 }
 
 void init_pmm() {
-    void* pool_start = get_largest_usable_memory_block();
+    uint64_t pool_start = (uint64_t) get_largest_usable_memory_block();
     uint64_t size = get_largest_usable_memory_block_size();
+
+    // check alignment
+    if(pool_start % PAGE_SIZE != 0) {
+#ifdef TEST_MODE
+        debug_printf("Largest usable memory block start is misaligned (%p), rounding to: ", pool_start);
+#endif
+        pool_start += PAGE_SIZE - (pool_start % PAGE_SIZE);
+
+#ifdef TEST_MODE 
+        debug_printf("%p\n", pool_start);
+#endif
+    }
+
+    uint64_t pool_end = (uintptr_t) pool_start + size;
+
+    if(pool_end % PAGE_SIZE != 0) {
+#ifdef TEST_MODE
+        debug_printf("Largest usable memory block end is misaligned (%p), rounding to: ", pool_start);
+#endif
+        pool_end -= pool_end % PAGE_SIZE;
+    }
+
+    size = pool_end - pool_start;
     max_available_pages = size / PAGE_SIZE;
     if(max_available_pages > MAX_PAGE_COUNT) max_available_pages = MAX_PAGE_COUNT;
-    pool_ptr = (uint64_t)pool_start;
+    pool_ptr = pool_start;
+    pool_end_ptr = pool_end;
     total = max_available_pages * PAGE_SIZE;
 }
 
@@ -48,7 +74,12 @@ void init_pmm() {
 #include "test/assert.h"
 void test_allocator() {
     debug("[TEST] page frame allocator test begin");
+    debug_printf("Page frame pool start: %p | end: %p\n", pool_ptr, pool_end_ptr);
     bool pass = true;
+
+    pass &= assert_equals_uint(0, pool_ptr % PAGE_SIZE, "is page pool start aligned?");
+    pass &= assert_equals_uint(0, pool_end_ptr % PAGE_SIZE, "is page pool end aligned?");
+
     pageframe_t p1, p2, p3, p4;
     p1 = kalloc_frame();
     p2 = kalloc_frame();
