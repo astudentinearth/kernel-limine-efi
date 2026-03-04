@@ -54,15 +54,7 @@ void test_allocator() {
     p2 = kalloc_frame();
     p3 = kalloc_frame();
     p4 = kalloc_frame();
-    debug_puts("Allocated frames: ");
-    debug_put_hex(p1);
-    debug_puts(" ");
-    debug_put_hex(p2);
-    debug_puts(" ");
-    debug_put_hex(p3);
-    debug_puts(" ");
-    debug_put_hex(p4);
-    debug_newline();
+    debug_printf("Allocated frames: %X %X %X %X\n", p1, p2, p3, p4);
     uint64_t i1, i2, i3, i4;
     i1 = get_frame_idx(p1);
     i2 = get_frame_idx(p2);

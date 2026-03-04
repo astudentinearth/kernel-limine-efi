@@ -19,4 +19,4 @@ void debug_put_uint(uint64_t num);
 void debug_put_hex(uint64_t num);
 void debug_newline();
 void panic(const char* message);
-
+void debug_printf(const char* msg, int n, ...);

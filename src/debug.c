@@ -3,6 +3,7 @@
 #include "hardware/serial.h"
 #include "mem.h"
 #include "string.h"
+#include <stdarg.h>
 
 void debug(const char* msg) {
     debug_puts(msg);
@@ -14,6 +15,7 @@ void debug_puts(const char* msg) {
         outb(COM1, *c);
     }
 }
+
 
 void debug_put_int(int64_t num) {
     char debug_itoa_buffer[DEBUG_ITOA_BUFFER_SIZE];
@@ -45,5 +47,48 @@ void panic(const char *message) {
     debug("CRASHED");
     debug(message);
     asm ("cli; hlt");
+}
+
+void debug_printf(const char* msg, int n, ...) {
+    va_list args;
+    va_start(args, n);
+    for(;*msg != 0;msg++) {
+        char ch = *msg;
+        if(ch == '%') {
+            char fmt = *(++msg);
+            if(fmt == 0) return;
+            switch(fmt) {
+                case 'i':
+                case 'd':
+                    debug_put_int(va_arg(args, uint32_t));
+                    continue;
+
+                case 'u':
+                    debug_put_uint(va_arg(args, uint64_t));
+                    continue;
+
+                case 'x': //TODO: implement lowercase later
+                case 'X':
+                    debug_put_hex(va_arg(args, uint64_t));
+                    continue;
+
+                case 'c':
+                    outb(COM1, va_arg(args, int));
+                    continue;
+
+                case 's':
+                    debug_puts(va_arg(args, const char*));
+                    continue;
+
+                default:
+                case '%': // handle the %% case
+                    outb(COM1, '%');
+                    continue;
+
+            }
+        }
+        outb(COM1, ch);
+    }
+    va_end(args);
 }
 
