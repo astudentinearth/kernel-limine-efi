@@ -49,9 +49,9 @@ void panic(const char *message) {
     asm ("cli; hlt");
 }
 
-void debug_printf(const char* msg, int n, ...) {
+void debug_printf(const char* msg, ...) {
     va_list args;
-    va_start(args, n);
+    va_start(args, msg);
     for(;*msg != 0;msg++) {
         char ch = *msg;
         if(ch == '%') {
@@ -77,7 +77,7 @@ void debug_printf(const char* msg, int n, ...) {
                     continue;
 
                 case 's':
-                    debug_puts(va_arg(args, const char*));
+                    debug_puts(va_arg(args, char*));
                     continue;
 
                 default:
