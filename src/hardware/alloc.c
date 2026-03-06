@@ -73,13 +73,16 @@ void init_pmm() {
 
 #ifdef TEST_MODE
 #include "test/assert.h"
+#include "test/test.h"
 void test_allocator() {
-    debug("[TEST] page frame allocator test begin");
     debug_printf("Page frame pool start: %p | end: %p\n", pool_ptr, pool_end_ptr);
     bool pass = true;
 
-    pass &= assert_equals_uint(0, pool_ptr % PAGE_SIZE, "is page pool start aligned?");
-    pass &= assert_equals_uint(0, pool_end_ptr % PAGE_SIZE, "is page pool end aligned?");
+    describe(
+        "pool alignment check",
+        assert_equals_uint(0, pool_ptr % PAGE_SIZE, "is page pool start aligned?"),
+        assert_equals_uint(0, pool_end_ptr % PAGE_SIZE, "is page pool end aligned?")
+    );
 
     pageframe_t p1, p2, p3, p4;
     p1 = kalloc_frame();
@@ -93,22 +96,26 @@ void test_allocator() {
     i3 = get_frame_idx(p3);
     i4 = get_frame_idx(p4);
 
-    pass &= assert(frame_map[i1] == USED, "frame 1 used");
-    pass &= assert(frame_map[i2] == USED, "frame 2 used");
-    pass &=assert(frame_map[i3] == USED, "frame 3 used");
-    pass &=assert(frame_map[i4] == USED, "frame 4 used");
-
+    describe(
+        "used frame check",
+        assert(frame_map[i1] == USED, "frame 1 used"),
+        assert(frame_map[i2] == USED, "frame 2 used"),
+        assert(frame_map[i3] == USED, "frame 3 used"),
+        assert(frame_map[i4] == USED, "frame 4 used")
+    );
     debug("Freeing frames");
     kfree_frame(p1);
     kfree_frame(p2);
     kfree_frame(p3);
     kfree_frame(p4);
 
-    pass &= assert(frame_map[i1] == FREE, "frame 1 free");
-    pass &= assert(frame_map[i2] == FREE, "frame 2 free");
-    pass &= assert(frame_map[i3] == FREE, "frame 3 free");
-    pass &= assert(frame_map[i4] == FREE, "frame 4 free");
-    debug_printf("[TEST] page frame allocator test %s\n", pass ? "pass" : "fail");
+    describe(
+        "free frame check",
+        assert(frame_map[i1] == FREE, "frame 1 free"),
+        assert(frame_map[i2] == FREE, "frame 2 free"),
+        assert(frame_map[i3] == FREE, "frame 3 free"),
+        assert(frame_map[i4] == FREE, "frame 4 free")
+    );
 }
 #endif
 

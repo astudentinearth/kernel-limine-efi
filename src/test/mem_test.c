@@ -2,6 +2,7 @@
 #ifdef TEST_MODE
 #include "debug.h"
 #include "mem.h"
+#include "test/assert.h"
 
 struct TestBlock {
     int x;
@@ -9,8 +10,7 @@ struct TestBlock {
     char z;
 };
 
-static inline void test_memcpy() {
-    debug("[TEST] Testing memcpy");
+void test_memcpy() {
     struct TestBlock b1;
     struct TestBlock b2;
 
@@ -23,13 +23,14 @@ static inline void test_memcpy() {
     b2.z = 'q';
 
     memcpy(&b2, &b1, sizeof(struct TestBlock));
-    
-    if(b2.x != 12 || b2.y != 24 || b2.z != 'c') {
-        debug("[TEST] memcpy test FAIL.");
-    }
-    else {
-        debug("[TEST] memcpy test PASS.");
-    }
+
+    describe(
+        "memcpy", 
+        assert(b2.x == 12, "x"), 
+        assert(b2.y == 24, "y"), 
+        assert(b2.z == 'c', "c")
+    );
+
 
 }
 #endif

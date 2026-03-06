@@ -8,6 +8,7 @@
 #define FG_CYAN       "\x1b[36m"
 #define FG_WHITE      "\x1b[37m"
 #define FG_DEFAULT    "\x1b[39m"
-
+#define FG_BOLD       "\x1b[1m"
+#define FG_RESET_BOLD "\x1b[22m"
 
 

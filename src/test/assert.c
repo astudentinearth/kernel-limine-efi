@@ -5,7 +5,8 @@
 #include "string.h"
 #include "term.h"
 
-
+static uint32_t total_passed;
+static uint32_t total_failed;
 
 bool _assert(const char* file, int line, bool actual, const char *label) {
     if(!actual) {
@@ -56,7 +57,15 @@ bool _describe(const char *file, int line, const char *name, ...) {
     }
 
     va_end(args);
+    total_passed += pass;
+    total_failed += fail;
     return fail == 0;
+}
+
+void print_test_report() {
+    debug_printf("\n%s[TEST] Test report%s\n", FG_CYAN, FG_DEFAULT);
+    debug_printf("       %s%s%d passed.%s\n", FG_BOLD, FG_GREEN, total_passed, FG_DEFAULT);
+    debug_printf("       %s%d failed.%s%s\n\n", FG_RED, total_failed, FG_DEFAULT, FG_RESET_BOLD);
 }
 
 #endif

@@ -9,6 +9,7 @@ bool _assert_equals_uint(const char* file, int line, uint64_t expected, uint64_t
 void _test_pass(const char* file, int line, const char* msg);
 
 bool _describe(const char* file, int line, const char* name, ...);
+void print_test_report();
 
 #define test_pass(label) _test_pass ( __FILE__, __LINE__, label )
 #define assert(actual, msg) _assert(__FILE__, __LINE__, actual, msg)

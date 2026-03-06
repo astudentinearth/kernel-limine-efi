@@ -40,12 +40,9 @@ void kmain(void) {
 
     #ifdef TEST_MODE
     debug("Running in test mode");
-    run_tests();
     dump_memory_info();
     draw_char(16, 16, 'A', 0xffffffff);
-    debug_err("Error message test %X\n", 0x1234);
-    test_allocator();
-
+    run_tests();
     #endif
 
 

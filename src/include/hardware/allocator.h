@@ -10,7 +10,3 @@ void kfree_frame(pageframe_t);
 
 void init_pmm();
 
-#ifdef TEST_MODE
-void test_allocator();
-#endif
-
