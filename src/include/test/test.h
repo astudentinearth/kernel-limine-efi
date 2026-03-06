@@ -2,7 +2,8 @@
 #include "debug.h"
 #include "mem_test.h"
 #include "hardware/cpu.h"
-#include "string_test.h"
+
+void test_string_h();
 
 static inline void run_tests() {
     #ifdef TEST_MODE
