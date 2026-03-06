@@ -5,6 +5,7 @@
 void itoa(int64_t num, char *buf){
     if(num == 0) {
         buf[0] = '0';
+        buf[1] = 0;
         return;
     }
 
@@ -24,6 +25,8 @@ void itoa(int64_t num, char *buf){
         digit_count++;
     }
 
+    *cur = 0;
+
     char* seq = num < 0 ? buf + 1 : buf;
 
     for(int i = 0; i < digit_count / 2; i++) {
@@ -37,24 +40,22 @@ void itoa(int64_t num, char *buf){
 void itoa_u(uint64_t num, char *buf){
     if(num == 0) {
         buf[0] = '0';
+        buf[1] = 0;
         return;
     }
 
     int digit_count = 0;
     char* cur = buf;
 
-    if(num < 0) {
-        *cur++ = '-';
-    }
-
     // convert to digits in reverse
     while(num > 0) {
-        int64_t remainder = num % 10;
+        uint64_t remainder = num % 10;
         num /= 10;
         *cur++ = digit_to_ascii(remainder);
         digit_count++;
     }
-
+    
+    *cur = 0;
     char* seq = buf;
 
     for(int i = 0; i < digit_count / 2; i++) {
@@ -69,6 +70,7 @@ void itoa_hex(uint64_t num, char *buf) {
 
     if(num == 0) {
         buf[0] = '0';
+        buf[1] = 0;
         return;
     }
 
@@ -83,6 +85,7 @@ void itoa_hex(uint64_t num, char *buf) {
         digit_count++;
     }
 
+    *cur = 0;
     char* seq = buf;
 
     for(int i = 0; i < digit_count / 2; i++) {
