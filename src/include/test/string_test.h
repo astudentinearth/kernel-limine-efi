@@ -4,6 +4,7 @@
 #ifdef TEST_MODE
 
 #include "string.h"
+#include "mem.h"
 #include "test/assert.h"
 
 
@@ -20,10 +21,10 @@ static inline void test_str_equals() {
             !str_equals(a, d) &&
             !str_equals(c, d)
       )    {
-        debug("[TEST] str_equals test PASS.");
+        test_pass("[TEST] str_equals test PASS.");
     }
     else {
-        debug("[TEST] str_equals test FAIL.");
+        debug_err("[TEST] str_equals test FAIL.");
     }
 }
 
@@ -62,7 +63,6 @@ fail:
 }
 
 static inline void test_itoa_hex() {
-    debug("[TEST] Testing itoa_hex");
     char buf1[SIZE];
     char buf2[SIZE];
     char buf3[SIZE];
@@ -73,14 +73,12 @@ static inline void test_itoa_hex() {
     itoa_hex(0x19B, buf3);
     itoa_hex(0x0, buf4);
 
-    bool pass =
-        assert_equals_str("FFFF", buf1, "itoa_hex")
-        && assert_equals_str("ABC123", buf2, "itoa_hex")
-        && assert_equals_str("19B", buf3, "itoa_hex")
-        && assert_equals_str("0", buf4, "itoa_hex");
-
-    if(pass) debug("[TEST] itoa_hex test PASS.");
-    else debug("[TEST] itoa_hex test FAIL.");
+    describe("convert uint to hex string",
+        assert_equals_str("FFFF", buf1, "buf1"),
+        assert_equals_str("ABC123", buf2, "buf2"),
+        assert_equals_str("19B", buf3, "buf3"),
+        assert_equals_str("0", buf4, "buf4")
+    );
 
 }
 

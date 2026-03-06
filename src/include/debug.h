@@ -20,3 +20,5 @@ void debug_put_hex(uint64_t num);
 void debug_newline();
 void panic(const char* message);
 void debug_printf(const char* msg, ...);
+void debug_err(const char* msg, ...);
+void debug_success(const char* msg, ...);

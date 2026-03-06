@@ -15,6 +15,7 @@ static uint64_t max_available_pages;
 static uint64_t total_allocated = 0;
 static uint64_t total = 0;
 
+
 pageframe_t kalloc_frame(){
     uint64_t i = 0;
     while(frame_map[i] != FREE) {

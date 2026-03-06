@@ -2,6 +2,7 @@
 #include "debug.h"
 #include "hardware/serial.h"
 #include "mem.h"
+#include "term.h"
 #include "string.h"
 #include <stdarg.h>
 
@@ -49,9 +50,7 @@ void panic(const char *message) {
     asm ("cli; hlt");
 }
 
-void debug_printf(const char* msg, ...) {
-    va_list args;
-    va_start(args, msg);
+void debug_printf_out(const char* msg, va_list args) {
     for(;*msg != 0;msg++) {
         char ch = *msg;
         if(ch == '%') {
@@ -90,6 +89,30 @@ void debug_printf(const char* msg, ...) {
         }
         outb(COM1, ch);
     }
+}
+
+void debug_printf(const char* msg, ...) {
+    va_list args;
+    va_start(args, msg);
+    debug_printf_out(msg, args);
+    va_end(args);
+}
+
+void debug_err(const char* msg, ...) {
+    va_list args;
+    va_start(args, msg);
+    debug_puts(FG_RED);
+    debug_printf_out(msg, args);
+    debug_puts(FG_DEFAULT);
+    va_end(args);
+}
+
+void debug_success(const char* msg, ...) {
+    va_list args;
+    va_start(args, msg);
+    debug_puts(FG_GREEN);
+    debug_printf_out(msg, args);
+    debug_puts(FG_DEFAULT);
     va_end(args);
 }
 
