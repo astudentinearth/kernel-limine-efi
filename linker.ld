@@ -58,8 +58,9 @@ SECTIONS
     .bss : {
         *(.bss .bss.*)
         *(COMMON)
-        endkernel = .;
     } :data
+
+    _kernel_end = .;
 
     /* Discard .note.* and .eh_frame* since they may cause issues on some hosts. */
     /DISCARD/ : {
@@ -67,3 +68,4 @@ SECTIONS
         *(.note .note.*)
     }
 }
+

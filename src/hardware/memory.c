@@ -9,6 +9,7 @@ static uint64_t memmap_entry_count;
 static bool memmap_initialized = false;
 static void* largest_memory_block_start;
 static uint64_t largest_memory_block_size;
+extern char _kernel_end[];
 
 void init_memory_map() {
     struct limine_memmap_response *memmap_response = get_limine_memmap();
@@ -59,7 +60,7 @@ uint64_t get_largest_usable_memory_block_size() {
 
 #ifdef TEST_MODE
 static void dump_memory_entry(struct limine_memmap_entry* entry) {
-    debug_printf("Memory entry | Start: %p | Length: %p | Type: ", entry->base, entry->length);
+    debug_printf("Memory entry | Start: %p | Length: %u | Type: ", entry->base, entry->length);
     switch(entry->type) {
         case LIMINE_MEMMAP_USABLE:
             debug_puts("USABLE");
@@ -68,6 +69,9 @@ static void dump_memory_entry(struct limine_memmap_entry* entry) {
         case LIMINE_MEMMAP_ACPI_NVS:
             debug_puts("ACPI_NVS");
             break;
+
+        case LIMINE_MEMMAP_EXECUTABLE_AND_MODULES:
+            debug_puts("EXECTUABLE_AND_MODULES");
 
         case LIMINE_MEMMAP_ACPI_RECLAIMABLE:
             debug_puts("ACPI_RECLAIMABLE");
@@ -109,6 +113,7 @@ void dump_memory_info() {
 
     debug_printf("---\n");
     debug_printf("Kernel address | Physical: %p | Virtual: %p\n", get_physical_executable_base(), get_virtual_executable_base());
+    debug_printf("Kernel end (per linker symbol): %p\n", (uint64_t)_kernel_end);
     debug_printf("HHDM offset: %p\n", get_hhdm_offset());
     debug_printf("---\n");
     debug_puts("\n[[[ END MEMORY INFO ]]]\n");

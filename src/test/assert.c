@@ -23,6 +23,14 @@ bool _assert_equals_uint(const char* file, int line, uint64_t expected, uint64_t
     return true;
 }
 
+bool _assert_equals_ptr(const char* file, int line, void* expected, void* actual, const char *label) {
+    if(expected != actual) {
+        debug_err("[FAIL] [%s:%d] [%s] Expected: %p | Received: %p\n", file, line, label, expected, actual);
+        return false;
+    }
+    return true;
+}
+
 bool _assert_equals_str(const char* file, int line, const char *expected, const char *actual, const char *label) {
     bool success = str_equals(expected, actual);
     if(!success) {
