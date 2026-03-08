@@ -21,4 +21,5 @@ void debug_newline();
 void panic(const char* message);
 void debug_printf(const char* msg, ...);
 void debug_err(const char* msg, ...);
+void debug_info(const char* msg, ...);
 void debug_success(const char* msg, ...);

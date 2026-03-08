@@ -12,3 +12,14 @@
 #define FG_RESET_BOLD "\x1b[22m"
 
 
+#define BG_BLACK      "\x1b[40m"
+#define BG_RED        "\x1b[41m"
+#define BG_GREEN      "\x1b[42m"
+#define BG_YELLOW     "\x1b[43m"
+#define BG_BLUE       "\x1b[44m"
+#define BG_MAGENTA    "\x1b[45m"
+#define BG_CYAN       "\x1b[46m"
+#define BG_WHITE      "\x1b[47m"
+#define BG_DEFAULT    "\x1b[49m"
+
+

@@ -91,6 +91,9 @@ void debug_printf_out(const char* msg, va_list args) {
     }
 }
 
+#define LOG_INFO BG_BLUE FG_BLACK FG_BOLD "INFO" BG_DEFAULT FG_DEFAULT FG_RESET_BOLD " "
+#define LOG_ERR BG_RED FG_BLACK FG_BOLD "ERROR" BG_DEFAULT FG_RED FG_RESET_BOLD " "
+
 void debug_printf(const char* msg, ...) {
     va_list args;
     va_start(args, msg);
@@ -98,10 +101,19 @@ void debug_printf(const char* msg, ...) {
     va_end(args);
 }
 
+void debug_info(const char* msg, ...) {
+    va_list args;
+    va_start(args, msg);
+    debug_printf(LOG_INFO);
+    debug_printf_out(msg, args);
+    debug_puts(FG_DEFAULT);
+    va_end(args);
+}
+
 void debug_err(const char* msg, ...) {
     va_list args;
     va_start(args, msg);
-    debug_puts(FG_RED);
+    debug_printf(LOG_ERR);
     debug_printf_out(msg, args);
     debug_puts(FG_DEFAULT);
     va_end(args);

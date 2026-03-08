@@ -117,13 +117,6 @@ uint64_t *create_pd()
     pageframe_t frame = kalloc_frame();
     uint64_t *ptr = (uint64_t *)get_virtaddr((void *)frame);
 
-    // check if the virtual address is mapped in the active pml4
-    uint64_t *physical_address = get_physaddr(ptr, get_active_pml4());
-
-    if (physical_address == NULL) {
-        // the region we need isn't mapped, we need to map it
-    }
-
     for (int i = 0; i < 512; i++) {
         ptr[i] = 0;
     }
@@ -236,7 +229,6 @@ void init_paging()
     debug_printf("Initializing paging\n");
     kernel_pml4 = get_virtaddr((void *)kalloc_frame());
     memset(kernel_pml4, 0, PAGE_SIZE);
-    dump_pml4(get_active_pml4());
     map_kernel();
     map_hhdm();
     void *pml4_addr = get_physaddr(kernel_pml4, get_active_pml4());
