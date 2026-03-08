@@ -1,23 +1,26 @@
-#include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
-#include "debug.h"
-#include "gfx.h"
-#include "test/test.h"
-#include "gdt.h"
-#include "idt.h"
 #include "boot/limine_requests.h"
-#include "hardware/memory.h"
+#include "debug.h"
+#include "gdt.h"
+#include "gfx.h"
 #include "hardware/allocator.h"
+#include "hardware/memory.h"
 #include "hardware/pic.h"
+#include "idt.h"
+#include "paging.h"
+#include "test/test.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
-static void hcf(void) {
+static void hcf(void)
+{
     for (;;) {
-        asm ("hlt");
+        asm("hlt");
     }
 }
 
-void kmain(void) {
+void kmain(void)
+{
     // Ensure the bootloader actually understands our base revision (see spec).
     if (!is_base_revision_supported() || !limine_framebuffer_available()) {
         hcf();
@@ -37,15 +40,14 @@ void kmain(void) {
     check_apic();
     debug("If you didn't triple fault here congrats");
 
-
-    #ifdef TEST_MODE
+#ifdef TEST_MODE
     debug("Running in test mode");
     dump_memory_info();
     draw_char(16, 16, 'A', 0xffffffff);
     run_tests();
-    #endif
+#endif
 
-
+    init_paging();
     // We're done, just hang...
     hcf();
 }

@@ -1,3 +1,4 @@
+#pragma once
 #include <stdint.h>
 
 #define PSF1_FONT_MAGIC 0x0436

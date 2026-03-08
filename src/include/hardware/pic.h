@@ -1,3 +1,4 @@
+#pragma once
 #include <stdbool.h>
 #define PIC1_8259_COMMAND   0x0020
 #define PIC1_8259_DATA      0x0021

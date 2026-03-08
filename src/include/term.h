@@ -1,4 +1,4 @@
-
+#pragma once
 #define FG_BLACK      "\x1b[30m"
 #define FG_RED        "\x1b[31m"
 #define FG_GREEN      "\x1b[32m"

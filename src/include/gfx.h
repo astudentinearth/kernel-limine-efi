@@ -1,3 +1,4 @@
+#pragma once
 #include "limine.h"
 #include <stdint.h>
 void draw_line(int x, int y);

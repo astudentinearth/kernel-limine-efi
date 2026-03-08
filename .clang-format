@@ -1,0 +1,12 @@
+BasedOnStyle: LLVM
+IndentWidth:  4
+BreakBeforeBraces: Custom
+TabWidth: 4
+UseTab:   Never
+
+BraceWrapping:
+  AfterFunction: true
+
+InsertBraces: true
+AllowShortBlocksOnASingleLine: Always
+AllowShortIfStatementsOnASingleLine: AllIfsAndElse
