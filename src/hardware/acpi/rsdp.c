@@ -7,12 +7,13 @@
 #include "paging.h"
 #include <stdbool.h>
 #include <stdint.h>
+#include "mem.h"
 
 static const struct RSDP_t *rsdp;
 static const struct XSDP_t *xsdp;
 static uint32_t rsdp_revision;
 
-bool validate_rsdp(struct RSDP_t *rsdp) {
+bool validate_rsdp(const struct RSDP_t *rsdp) {
     uint8_t sum = 0;
     uint8_t *bytes = (uint8_t*)rsdp;
     for(unsigned int i = 0; i < sizeof(struct RSDP_t); i++) {
@@ -53,6 +54,15 @@ void limine_init_rsdp() {
     if(!is_valid_rsdp) {
         panic("RSDP invalid.\n");
     }
-    debug_info("RSDP is valid.\n");
+    char oemid[7];
+    memset(oemid, 0, 7);
+    memcpy(oemid, rsdp->OEMID, 6);
+
+    debug_info("RSDP is valid. OEM identifier: %s\n", oemid);
+}
+
+/** Returns the **physical** address of the RSDT. */
+uintptr_t get_rsdt_address() {
+    return rsdp->rsdt_address;   
 }
 

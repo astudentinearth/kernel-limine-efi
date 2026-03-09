@@ -50,6 +50,7 @@ void kmain(void)
     init_paging();
     init_apic();
     limine_init_rsdp();
+    init_rsdt();
     // We're done, just hang...
     hcf();
 }
