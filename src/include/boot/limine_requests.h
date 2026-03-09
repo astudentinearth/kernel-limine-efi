@@ -11,4 +11,5 @@ bool limine_framebuffer_available();
 uint64_t get_hhdm_offset();
 uint64_t get_physical_executable_base();
 uint64_t get_virtual_executable_base();
+struct limine_rsdp_response* get_limine_rsdp();
 

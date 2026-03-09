@@ -2,6 +2,7 @@
 #include "debug.h"
 #include "gdt.h"
 #include "gfx.h"
+#include "hardware/acpi.h"
 #include "hardware/allocator.h"
 #include "hardware/memory.h"
 #include "hardware/pic.h"
@@ -48,6 +49,7 @@ void kmain(void)
 
     init_paging();
     init_apic();
+    limine_init_rsdp();
     // We're done, just hang...
     hcf();
 }
