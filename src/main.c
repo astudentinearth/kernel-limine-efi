@@ -48,9 +48,9 @@ void kmain(void)
 #endif
 
     init_paging();
-    init_apic();
     limine_init_rsdp();
     init_rsdt();
+    init_apic();
     // We're done, just hang...
     hcf();
 }

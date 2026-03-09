@@ -183,7 +183,7 @@ void map_page(void *physical_address, void *virtual_address, uint32_t flags)
 
 void map_kernel()
 {
-    debug_printf("[DEBUG] Remapping kernel memory\n");
+    debug_info("Remapping kernel memory\n");
     uint64_t phys_base = get_physical_executable_base();
     uint64_t virt_base = get_virtual_executable_base();
     uint64_t kernel_end = (uint64_t)_kernel_end;
@@ -194,12 +194,12 @@ void map_kernel()
         phys_base += PAGE_SIZE;
         virt_base += PAGE_SIZE;
     }
-    debug_printf("[DEBUG] Remapped kernel memory\n");
+    debug_info("[DEBUG] Remapped kernel memory\n");
 }
 
 void map_hhdm()
 {
-    debug_printf("[DEBUG] Mapping all known memory blocks\n");
+    debug_info("[DEBUG] Mapping all known memory blocks\n");
 
     uint64_t entry_count = get_memmap_entry_count();
     struct limine_memmap_entry **memmap_entries = get_memmap_entries();
@@ -220,23 +220,23 @@ void map_hhdm()
                       kernel_pml4);
         }
     }
-    debug_printf("[DEBUG] Mapped all known memory blocks\n");
+    debug_info("[DEBUG] Mapped all known memory blocks\n");
 }
 
 void init_paging()
 {
     if (paging_initalized) { return; }
-    debug_printf("Initializing paging\n");
+    debug_info("Initializing paging\n");
     kernel_pml4 = get_virtaddr((void *)kalloc_frame());
     memset(kernel_pml4, 0, PAGE_SIZE);
     map_kernel();
     map_hhdm();
     void *pml4_addr = get_physaddr(kernel_pml4, get_active_pml4());
-    debug_printf("Kernel stack pointer address: %p\n", get_rsp());
-    debug_printf("Swapping CR3 to %p\n", pml4_addr);
+    debug_info("Kernel stack pointer address: %p\n", get_rsp());
+    debug_info("Swapping CR3 to %p\n", pml4_addr);
     set_pml4_addr(pml4_addr);
     paging_initalized = true;
-    debug_printf("We own the pages! CR3 at: %p\n", get_cr3());
+    debug_info("We own the pages! CR3 at: %p\n", get_cr3());
 }
 
 #ifdef TEST_MODE
