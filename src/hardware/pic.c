@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 static uintptr_t apic_base;
-static uintptr_t io_apic_base;
+static io_apic_t default_apic;
 
 void disable_legacy_pic(void)
 {
@@ -44,6 +44,27 @@ uintptr_t cpu_get_apic_base()
     cpu_get_msr(IA32_APIC_BASE_MSR, &eax, &edx);
     return (eax & 0xfffff000);
 }
+
+
+uint32_t read_ioapic_reg(io_apic_t apic, uint8_t offset) {
+    *(uint32_t volatile*)(apic.virt_addr) = offset; // select register
+    return *(volatile uint32_t*)(apic.virt_addr + 0x10);
+}
+
+void write_ioapic_reg(io_apic_t apic, uint8_t offset, uint32_t data) {
+    *(uint32_t volatile*)(apic.virt_addr) = offset;
+    *(uint32_t volatile*)(apic.virt_addr + 0x10) = data;
+}
+
+void setup_ioapic(io_apic_t *apic, void *phys_addr, uint64_t gsib) {
+    apic->global_interrupt_base = gsib;
+    apic->phys_addr = (uintptr_t)phys_addr;
+    apic->virt_addr = (uintptr_t)get_virtaddr(phys_addr);
+    apic->id = (read_ioapic_reg(*apic, IOAPICID) >> 24) & 0x0F;
+    apic->max_redir_entry_count = (read_ioapic_reg(*apic, IOAPICVER) >> 16) + 1;
+    debug_info("IOAPIC %d initialized with %d max entries\n", apic->id, apic->max_redir_entry_count);
+};
+
 
 void parse_madt()
 {
@@ -84,12 +105,18 @@ void parse_madt()
                 "acpi: found ioapic id %d @%p with global system int base %p\n",
                 entry->io_apic_id, entry->io_apic_phys_addr,
                 entry->global_system_interrupt_base);
+
+            void *ioapic_virt = get_virtaddr((void*)(uintptr_t)entry->io_apic_phys_addr);
+            map_page((void*)(uintptr_t)entry->io_apic_phys_addr, ioapic_virt, READ_WRITE | PAGE_CACHE_DISABLE);
+            debug_info("acpi: mapped ioapic to virtual address @%p\n", ioapic_virt);
+            setup_ioapic(&default_apic, (void*)(uintptr_t)entry->io_apic_phys_addr, entry->global_system_interrupt_base);
             break;
         }
         default: {
             debug_info("Skipped MADT entry type %d with length %d\n",
                        current_header->entry_type,
                        current_header->record_length);
+            break;
         }
         }
         remaining_length -= current_header->record_length;
@@ -98,6 +125,7 @@ void parse_madt()
                                          current_header->record_length);
     }
 }
+
 
 void init_apic()
 {
