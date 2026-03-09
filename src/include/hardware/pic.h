@@ -23,23 +23,29 @@ void init_apic();
 #define IOAPIC_DESTINATION_MODE_PHYSICAL 0
 #define IOAPIC_DESTINATION_MODE_LOGICAL 1
 
-#define IOAPICID          0x00
-#define IOAPICVER         0x01
-#define IOAPICARB         0x02
-#define IOAPICREDTBL(n)   (0x10 + 2 * n) // lower-32bits (add +1 for upper 32-bits)
+#define IOAPICID 0x00
+#define IOAPICVER 0x01
+#define IOAPICARB 0x02
+#define IOAPICREDTBL(n)                                                        \
+    (0x10 + 2 * n) // lower-32bits (add +1 for upper 32-bits)
 
 struct io_apic_redirection_entry {
-    uint64_t vector: 8;
-    uint64_t delivery_mode: 3;
-    uint64_t destination_mode: 1;
-    uint64_t delivery_status: 1;
-    uint64_t pin_polarity: 1;
-    uint64_t remote_irr: 1;
-    uint64_t trigger_mode: 1;
-    uint64_t mask: 1;
-    uint64_t reserved: 39;
-    uint64_t destination: 8;
+    uint64_t vector : 8;
+    uint64_t delivery_mode : 3;
+    uint64_t destination_mode : 1;
+    uint64_t delivery_status : 1;
+    uint64_t pin_polarity : 1;
+    uint64_t remote_irr : 1;
+    uint64_t trigger_mode : 1;
+    uint64_t mask : 1;
+    uint64_t reserved : 39;
+    uint64_t destination : 8;
 } __attribute__((packed));
+
+typedef struct {
+    uint32_t lower;
+    uint32_t upper;
+} io_apic_redirection_entry_t;
 
 typedef struct {
     uintptr_t phys_addr;
@@ -49,7 +55,14 @@ typedef struct {
     uint8_t max_redir_entry_count;
 } io_apic_t;
 
-void setup_ioapic(io_apic_t *apic, void *phys_addr,uint64_t gsib);
+void setup_ioapic(io_apic_t *apic, void *phys_addr, uint64_t gsib);
 uint32_t read_ioapic_reg(io_apic_t apic, uint8_t offset);
 void write_ioapic_reg(io_apic_t apic, uint8_t offset, uint32_t data);
 
+void read_ioapic_redir_entry(io_apic_t apic, uint8_t n,
+                             io_apic_redirection_entry_t *out);
+
+void write_ioapic_redir_entry(io_apic_t apic, uint8_t n,
+                              io_apic_redirection_entry_t entry);
+
+io_apic_t *get_default_ioapic();
