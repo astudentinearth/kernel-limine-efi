@@ -4,7 +4,7 @@
 
 typedef unsigned long long int uword_t;
 
-#define IDT_MAX_DESCRIPTORS 32
+#define IDT_MAX_DESCRIPTORS 256
 
 struct InterruptDescriptor64 {
     uint16_t offset_15_0;

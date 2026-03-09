@@ -31,7 +31,7 @@ void setup_idt() {
   uint16_t limit = sizeof(struct InterruptDescriptor64) * IDT_MAX_DESCRIPTORS;
   uint64_t base = (uint64_t)&idt[0];
 
-  for (uint8_t vector = 0; vector < 32; vector++) {
+  for (uint16_t vector = 0; vector < IDT_MAX_DESCRIPTORS; vector++) {
     idt_set_descriptor(vector, isr_stub_table[vector], 0x8E);
     vectors[vector] = true;
   }

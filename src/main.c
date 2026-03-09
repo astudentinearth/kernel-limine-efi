@@ -37,7 +37,6 @@ void kmain(void)
     set_framebuffer(framebuffer);
     gfx_init();
     init_pmm();
-    check_apic();
     debug("If you didn't triple fault here congrats");
 
 #ifdef TEST_MODE
@@ -48,6 +47,7 @@ void kmain(void)
 #endif
 
     init_paging();
+    init_apic();
     // We're done, just hang...
     hcf();
 }

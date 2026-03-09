@@ -14,5 +14,13 @@
 #define IS_PRESENT 0x1
 #define READ_WRITE 0x2
 #define PS 0x80
+#define PAGE_CACHE_DISABLE 0x10
+#define USER_PAGE 0x4
 
 void init_paging();
+void* get_virtaddr(void* phys_addr);
+void* get_physaddr(void* virt_addr, uint64_t *pml4);
+uint64_t* get_active_pml4();
+
+void map_page(void *physical_address, void *virtual_address, uint32_t flags);
+
