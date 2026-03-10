@@ -17,8 +17,13 @@ void disable_legacy_pic(void);
 bool check_apic(void);
 void init_apic();
 
-#define IOAPIC_DELIVERY_MODE_EDGE 0
-#define IOAPIC_DELIVERY_MODE_LEVEL 1
+#define IOAPIC_DELIVERY_MODE_FIXED 0
+#define IOAPIC_DELIVERY_MODE_LOW 1
+#define IOAPIC_DELIVERY_MODE_SMI 2
+#define IOAPIC_DELIVERY_MODE_NMI 4
+#define IOAPIC_DELIVERY_MODE_INIT 5
+#define IOAPIC_DELIVERY_MODE_EXTINIT 7
+
 
 #define IOAPIC_DESTINATION_MODE_PHYSICAL 0
 #define IOAPIC_DESTINATION_MODE_LOGICAL 1
@@ -66,3 +71,6 @@ void write_ioapic_redir_entry(io_apic_t apic, uint8_t n,
                               io_apic_redirection_entry_t entry);
 
 io_apic_t *get_default_ioapic();
+void lapic_eoi();
+
+#define KEYBOARD_IRQ 1

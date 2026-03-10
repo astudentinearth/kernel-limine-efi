@@ -7,6 +7,13 @@ section .text
 
 extern handle_interrupt
 extern handle_interrupt_with_error_code
+extern keyboard_interrupt
+
+global enable_hardware_interrupts
+
+enable_hardware_interrupts:
+    sti
+    ret
 
 %macro isr_err_stub 1
 isr_stub_%+%1:
@@ -58,9 +65,18 @@ isr_no_err_stub 28
 isr_no_err_stub 29
 isr_err_stub    30
 isr_no_err_stub 31
+isr_no_err_stub 32
 
-%assign i 32
-%rep 224
+isr_stub_33:
+    push rax
+    in al, 0x60
+    mov rdi, rax
+    call keyboard_interrupt
+    pop rax
+    iretq
+
+%assign i 34
+%rep 222
     isr_no_err_stub i
 %assign i i+1
 %endrep

@@ -11,13 +11,21 @@
 #include <stddef.h>
 #include <stdint.h>
 
-static uintptr_t apic_base;
+uintptr_t apic_base;
 static io_apic_t default_apic;
+
+
 
 void disable_legacy_pic(void)
 {
     outb(PIC1_8259_DATA, 0xff);
     outb(PIC2_8259_DATA, 0xff);
+}
+
+__attribute__((used))
+void lapic_eoi();
+void lapic_eoi() {
+     *(volatile uint32_t*)(apic_base + 0xB0) = 0;
 }
 
 bool check_apic()

@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "hardware/io.h"
 
 static void hcf(void)
 {
@@ -20,6 +21,7 @@ static void hcf(void)
     }
 }
 
+extern void enable_hardware_interrupts();
 void kmain(void)
 {
     // Ensure the bootloader actually understands our base revision (see spec).
@@ -51,6 +53,8 @@ void kmain(void)
     limine_init_rsdp();
     init_rsdt();
     init_apic();
+    setup_keyboard();
+    enable_hardware_interrupts();
     // We're done, just hang...
     hcf();
 }
