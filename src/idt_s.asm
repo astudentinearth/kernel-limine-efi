@@ -10,10 +10,16 @@ extern handle_interrupt_with_error_code
 extern keyboard_interrupt
 
 global enable_hardware_interrupts
+global disable_hardware_interrupts
 
 enable_hardware_interrupts:
     sti
     ret
+
+disable_hardware_interrupts:
+    cli
+    ret
+
 
 %macro isr_err_stub 1
 isr_stub_%+%1:

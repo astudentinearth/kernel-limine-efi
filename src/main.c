@@ -16,7 +16,9 @@
 
 static void hcf(void)
 {
+    asm("hlt");
     for (;;) {
+        kern_handle_interrupt();
         asm("hlt");
     }
 }
