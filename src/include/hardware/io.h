@@ -1,5 +1,8 @@
 #pragma once
 #include <stdint.h>
+
+extern void outl(uint32_t port, uint32_t value);
+extern uint32_t inl(uint32_t port);
 void setup_keyboard();
 
 typedef struct {

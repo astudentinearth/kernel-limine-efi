@@ -5,6 +5,7 @@
 #include "hardware/acpi.h"
 #include "hardware/allocator.h"
 #include "hardware/memory.h"
+#include "hardware/pci.h"
 #include "hardware/pic.h"
 #include "idt.h"
 #include "paging.h"
@@ -57,6 +58,7 @@ void kmain(void)
     init_apic();
     setup_keyboard();
     enable_hardware_interrupts();
+    probe_pci();
     // We're done, just hang...
     hcf();
 }
