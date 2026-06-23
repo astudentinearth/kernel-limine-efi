@@ -32,3 +32,20 @@ uint16_t pci_check_vendor(uint8_t bus, uint8_t slot);
 #define PCI_VENDOR_NONEXISTENT_DEVICE 0xFFFF
 
 void probe_pci();
+
+
+
+typedef struct {
+    uint16_t bus;
+    uint8_t device;
+    uint8_t function;
+    uintptr_t bar0;
+    uintptr_t bar1;
+    uintptr_t bar2;
+    uintptr_t bar3;
+    uintptr_t bar4;
+    uintptr_t bar5;
+    uint8_t class;
+    uint8_t subclass;
+    uint8_t prog_if;
+} PCIDevice;
