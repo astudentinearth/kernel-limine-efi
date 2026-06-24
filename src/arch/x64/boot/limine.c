@@ -1,6 +1,6 @@
 
 #include "limine.h"
-#include "boot/limine_requests.h"
+#include "limine_requests.h"
 #include <stddef.h>
 
 __attribute__((used,
