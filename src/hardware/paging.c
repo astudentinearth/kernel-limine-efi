@@ -22,15 +22,11 @@ static bool paging_initalized = false;
 extern char _kernel_end[];
 
 void *get_virtaddr(void *phys)
-{
-    return (void *)((uint64_t)phys + get_hhdm_offset());
-}
+{ return (void *)((uint64_t)phys + get_hhdm_offset()); }
 
 /** Get a pointer to the active PML4, from the CR3 register */
 uint64_t *get_active_pml4()
-{
-    return ((uint64_t *)(get_virtaddr((void *)(get_cr3() & ~0xFFF))));
-}
+{ return ((uint64_t *)(get_virtaddr((void *)(get_cr3() & ~0xFFF)))); }
 
 /**
  * Evaluate a virtual address to a physical address for given page table
@@ -51,11 +47,11 @@ void *get_physaddr(void *virtual_addr, uint64_t *pml4)
     uint64_t pd_entry = pd[PD_IDX((uint64_t)virtual_addr)];
 
     // 2mb page
-    if(pd_entry & PS) {
+    if (pd_entry & PS) {
         uint64_t physical_addr = ENTRY_ADDR(pd_entry);
         uint64_t offset = PS_PAGE_OFFSET((uint64_t)virtual_addr);
 
-        return (void*)(physical_addr + offset);
+        return (void *)(physical_addr + offset);
     }
 
     if (!(pd_entry & IS_PRESENT)) { return NULL; }
@@ -136,7 +132,8 @@ void _map_page(void *physical_address, void *virtual_address, uint32_t flags,
             panic("PDPT NULL");
         }
         uint64_t new_pml4_entry =
-            ((uint64_t)get_physaddr(new_pdpt, get_active_pml4())) | (IS_PRESENT | flags);
+            ((uint64_t)get_physaddr(new_pdpt, get_active_pml4())) |
+            (IS_PRESENT | flags);
         *pml4_entry = new_pml4_entry;
     }
 
@@ -151,7 +148,8 @@ void _map_page(void *physical_address, void *virtual_address, uint32_t flags,
             panic("pd NULL");
         }
         uint64_t new_pdpt_entry =
-            ((uint64_t)get_physaddr(new_pd, get_active_pml4())) | (IS_PRESENT | flags);
+            ((uint64_t)get_physaddr(new_pd, get_active_pml4())) |
+            (IS_PRESENT | flags);
         *pdpt_entry = new_pdpt_entry;
     }
 
@@ -165,7 +163,8 @@ void _map_page(void *physical_address, void *virtual_address, uint32_t flags,
             panic("pt NULL");
         }
         uint64_t new_pd_entry =
-            ((uint64_t)get_physaddr(new_pt, get_active_pml4())) | (IS_PRESENT | flags);
+            ((uint64_t)get_physaddr(new_pt, get_active_pml4())) |
+            (IS_PRESENT | flags);
         *pd_entry = new_pd_entry;
     }
 
@@ -202,19 +201,19 @@ void map_hhdm()
     debug_info("[DEBUG] Mapping all known memory blocks\n");
 
     uint64_t entry_count = get_memmap_entry_count();
-    struct limine_memmap_entry **memmap_entries = get_memmap_entries();
+    MemoryMapEntry_t *memmap_entries = get_memmap_entries();
 
     for (unsigned int i = 0; i < entry_count; i++) {
-        struct limine_memmap_entry *current_entry = memmap_entries[i];
+        MemoryMapEntry_t current_entry = memmap_entries[i];
 
-        uint64_t page_count = current_entry->length / PAGE_SIZE;
+        uint64_t page_count = current_entry.length / PAGE_SIZE;
 
         // round up
-        if (current_entry->length % PAGE_SIZE != 0) { page_count++; }
+        if (current_entry.length % PAGE_SIZE != 0) { page_count++; }
 
         for (uint64_t i = 0; i < page_count; i++) {
             void *physical_address =
-                (void *)(current_entry->base + i * PAGE_SIZE);
+                (void *)(current_entry.base + i * PAGE_SIZE);
             void *virtual_address = get_virtaddr(physical_address);
             _map_page(physical_address, virtual_address, READ_WRITE,
                       kernel_pml4);
@@ -246,10 +245,11 @@ void test_paging()
     uint64_t kernel_phys = get_physical_executable_base();
     uint64_t kernel_virt = get_virtual_executable_base();
 
-    describe("initial kernel mapping",
-             assert_equals_ptr((void *)kernel_phys,
-                               get_physaddr((void *)kernel_virt, get_active_pml4()),
-                               "kernel virt to phys"));
+    describe(
+        "initial kernel mapping",
+        assert_equals_ptr((void *)kernel_phys,
+                          get_physaddr((void *)kernel_virt, get_active_pml4()),
+                          "kernel virt to phys"));
 }
 
 #endif
