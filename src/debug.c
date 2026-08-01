@@ -1,7 +1,6 @@
 
 #include "debug.h"
 #include "hardware/serial.h"
-#include "mem.h"
 #include "term.h"
 #include "string.h"
 #include <stdarg.h>

@@ -1,7 +1,6 @@
 
 #include "debug.h"
 #include "hardware/acpi.h"
-#include "mem.h"
 #include "paging.h"
 #include "string.h"
 #include <stdbool.h>

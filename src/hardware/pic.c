@@ -5,7 +5,7 @@
 #include "hardware/cpu.h"
 #include "hardware/msr.h"
 #include "hardware/serial.h"
-#include "mem.h"
+#include "string.h"
 #include "paging.h"
 #include <cpuid.h>
 #include <stddef.h>

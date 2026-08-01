@@ -1,7 +1,7 @@
 
 #ifdef TEST_MODE
 #include "debug.h"
-#include "mem.h"
+#include "string.h"
 #include "test/assert.h"
 
 struct TestBlock {

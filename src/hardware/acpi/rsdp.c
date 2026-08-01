@@ -7,7 +7,7 @@
 #include "paging.h"
 #include <stdbool.h>
 #include <stdint.h>
-#include "mem.h"
+#include "string.h"
 
 static const struct RSDP_t *rsdp;
 static const struct XSDP_t *xsdp;

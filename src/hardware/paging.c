@@ -5,7 +5,7 @@
 #include "hardware/allocator.h"
 #include "hardware/memory.h"
 #include "limine.h"
-#include "mem.h"
+#include "string.h"
 #include "test/assert.h"
 #include <stdbool.h>
 #include <stddef.h>
