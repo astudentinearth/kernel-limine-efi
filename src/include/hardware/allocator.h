@@ -13,3 +13,12 @@ void init_pmm();
 
 void* malloc(usize size);
 void free(void* ptr);
+
+typedef struct {
+    u64 mapped_count;
+    u64 total_count;
+    u64 page_size;
+} PMMStats_t;
+
+void get_pmm_stats(PMMStats_t* stats);
+u64 get_total_iter();

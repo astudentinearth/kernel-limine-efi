@@ -122,6 +122,7 @@ u64 *create_pd()
 void _map_page(void *physical_address, void *virtual_address, u32 flags,
                u64 *pml4)
 {
+    asm volatile ("cli");
     u64 *pml4_entry = &pml4[PML4_IDX((u64)virtual_address)];
 
     if (!(*pml4_entry & IS_PRESENT)) {
@@ -172,6 +173,7 @@ void _map_page(void *physical_address, void *virtual_address, u32 flags,
     u64 *pt_entry = &pt[PT_IDX((u64)virtual_address)];
     // we reached the end, map the page
     *pt_entry = (u64)physical_address | (IS_PRESENT | flags);
+    asm volatile ("sti");
 }
 
 void map_page(void *physical_address, void *virtual_address, u32 flags)
@@ -205,6 +207,7 @@ void map_hhdm()
 
     for (unsigned int i = 0; i < entry_count; i++) {
         MemoryMapEntry_t current_entry = memmap_entries[i];
+        if(current_entry.type == HW_RESERVED) continue;
 
         u64 page_count = current_entry.length / PAGE_SIZE;
 

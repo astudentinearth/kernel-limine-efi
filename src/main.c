@@ -4,16 +4,16 @@
 #include "gfx.h"
 #include "hardware/acpi.h"
 #include "hardware/allocator.h"
+#include "hardware/io.h"
 #include "hardware/memory.h"
 #include "hardware/pci.h"
 #include "hardware/pic.h"
 #include "idt.h"
 #include "paging.h"
 #include "test/test.h"
+#include "string.h"
 #include <stdbool.h>
 #include <stddef.h>
-#include "stdint.h"
-#include "hardware/io.h"
 
 static void hcf(void)
 {
@@ -59,6 +59,16 @@ void kmain(void)
     setup_keyboard();
     enable_hardware_interrupts();
     probe_pci();
-    // We're done, just hang...
+
+#ifdef TEST_MODE
+
+    PMMStats_t stats;
+    memset(&stats, 0, sizeof(PMMStats_t));
+    get_pmm_stats(&stats);
+    debug_info(
+        "== Page stats\nTotal pages: %u\nMapped pages: %u\nPage size: %u\nBitmap iterations: %u\n",
+        stats.total_count, stats.mapped_count, stats.page_size, get_total_iter());
+#endif
+
     hcf();
 }

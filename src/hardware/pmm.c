@@ -12,21 +12,26 @@ static bool frame_map[MAX_PAGE_COUNT];
 static u64 pool_ptr;
 static u64 pool_end_ptr;
 static u64 max_available_pages;
-static u64 total_allocated = 0;
-static u64 total = 0;
+static u64 total_allocated_pages = 0;
+static u64 total_initially_available = 0;
+static u64 total_iter = 0;
+
+static u64 last_allocated = 0;
+
+u64 get_total_iter() { return total_iter; }
 
 
 pageframe_t kalloc_frame(){
-    u64 i = 0;
-    while(frame_map[i] != FREE) {
-        i++;
-        if(i > max_available_pages) {
-            panic("Out of memory");
+    while(frame_map[last_allocated] != FREE) {
+        last_allocated++;
+        total_iter++;
+        if(last_allocated > max_available_pages) {
+            panic("Out of physical pages.");
         }
     }
-    frame_map[i] = USED;
-    total_allocated += PAGE_SIZE;
-    return pool_ptr + (i * PAGE_SIZE);
+    frame_map[last_allocated] = USED;
+    total_allocated_pages ++;
+    return pool_ptr + (last_allocated * PAGE_SIZE);
 }
 
 u64 get_frame_idx(pageframe_t pframe) {
@@ -36,7 +41,14 @@ u64 get_frame_idx(pageframe_t pframe) {
 void kfree_frame(pageframe_t pframe) {
     u64 index = get_frame_idx(pframe);
     frame_map[index] = FREE;
+    total_allocated_pages--;
 }
+
+void get_pmm_stats(PMMStats_t *stats) {
+    stats->mapped_count = total_allocated_pages;
+    stats->total_count = max_available_pages;
+    stats->page_size = PAGE_SIZE;
+}  
 
 void init_pmm() {
     u64 pool_start = (u64) get_largest_usable_memory_block();
@@ -68,7 +80,7 @@ void init_pmm() {
     if(max_available_pages > MAX_PAGE_COUNT) max_available_pages = MAX_PAGE_COUNT;
     pool_ptr = pool_start;
     pool_end_ptr = pool_end;
-    total = max_available_pages * PAGE_SIZE;
+    total_initially_available = max_available_pages * PAGE_SIZE;
 }
 
 #ifdef TEST_MODE
