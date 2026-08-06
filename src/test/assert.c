@@ -5,8 +5,8 @@
 #include "string.h"
 #include "term.h"
 
-static uint32_t total_passed;
-static uint32_t total_failed;
+static u32 total_passed;
+static u32 total_failed;
 
 bool _assert(const char* file, int line, bool actual, const char *label) {
     if(!actual) {
@@ -15,7 +15,7 @@ bool _assert(const char* file, int line, bool actual, const char *label) {
     return actual;
 }
 
-bool _assert_equals_uint(const char* file, int line, uint64_t expected, uint64_t actual, const char *label) {
+bool _assert_equals_uint(const char* file, int line, u64 expected, u64 actual, const char *label) {
     if(expected != actual) {
         debug_err("[FAIL] [%s:%d] [%s] Expected: %u | Received: %u\n", file, line, label, expected, actual);
         return false;

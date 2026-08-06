@@ -1,9 +1,9 @@
 #pragma once
-#include <stdint.h>
-uint16_t pci_config_read_word(uint8_t bus, uint8_t slot, uint8_t func,
-                              uint8_t offset);
+#include "stdint.h"
+u16 pci_config_read_word(u8 bus, u8 slot, u8 func,
+                              u8 offset);
 
-uint16_t pci_check_vendor(uint8_t bus, uint8_t slot);
+u16 pci_check_vendor(u8 bus, u8 slot);
 
 #define PCI_CONFIG_ADDRESS 0xCF8
 #define PCI_CONFIG_DATA 0xCFC
@@ -36,16 +36,16 @@ void probe_pci();
 
 
 typedef struct {
-    uint16_t bus;
-    uint8_t device;
-    uint8_t function;
-    uintptr_t bar0;
-    uintptr_t bar1;
-    uintptr_t bar2;
-    uintptr_t bar3;
-    uintptr_t bar4;
-    uintptr_t bar5;
-    uint8_t class;
-    uint8_t subclass;
-    uint8_t prog_if;
+    u16 bus;
+    u8 device;
+    u8 function;
+    uptr bar0;
+    uptr bar1;
+    uptr bar2;
+    uptr bar3;
+    uptr bar4;
+    uptr bar5;
+    u8 class;
+    u8 subclass;
+    u8 prog_if;
 } PCIDevice;

@@ -1,19 +1,19 @@
 #pragma once
-#include <stdint.h>
+#include "stdint.h"
 
-extern void outl(uint32_t port, uint32_t value);
-extern uint32_t inl(uint32_t port);
+extern void outl(u32 port, u32 value);
+extern u32 inl(u32 port);
 void setup_keyboard();
 
 typedef struct {
-    uint64_t type;
-    uint64_t payload;
+    u64 type;
+    u64 payload;
 } kinterrupt_t;
 
 #define NOOP 0
 #define KEYBOARD_INT 1
 
-void process_keyboard_event(uint8_t scancode);
+void process_keyboard_event(u8 scancode);
 void queue_interrupt(kinterrupt_t interrupt);
 void kern_handle_interrupt();
 

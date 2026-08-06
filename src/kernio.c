@@ -1,10 +1,10 @@
 #include "kernio.h"
 #include "gfx.h"
-#include <stdint.h>
+#include "stdint.h"
 
-uint32_t *fb_cursor;
+u32 *fb_cursor;
 
-void kernio_init(uint32_t *framebuffer) {
+void kernio_init(u32 *framebuffer) {
 
 }
 

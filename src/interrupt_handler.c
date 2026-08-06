@@ -8,7 +8,7 @@ static inline void dump_frame(struct interrupt_frame *frame) {
     #ifdef TEST_MODE
     debug("[[[ BEGIN INTERRUPT FRAME DUMP ]]]");
     debug_puts("Interrupt frame: ");
-    debug_put_hex((uint64_t)frame);
+    debug_put_hex((u64)frame);
     debug_puts("\nStack segment: ");
     debug_put_hex(frame->ss);
     debug_puts("\nCode segment: ");
@@ -25,8 +25,8 @@ static inline void dump_frame(struct interrupt_frame *frame) {
 }
 
 __attribute__((noreturn))
-void handle_interrupt(struct interrupt_frame *frame, uint64_t interrupt_code);
-void handle_interrupt(struct interrupt_frame *frame, uint64_t interrupt_code) {
+void handle_interrupt(struct interrupt_frame *frame, u64 interrupt_code);
+void handle_interrupt(struct interrupt_frame *frame, u64 interrupt_code) {
 #ifdef TEST_MODE
     debug_puts("[!] Interrupt - code ");
     debug_put_hex(interrupt_code);
@@ -37,8 +37,8 @@ void handle_interrupt(struct interrupt_frame *frame, uint64_t interrupt_code) {
 }
 
 __attribute__((noreturn))
-void handle_interrupt_with_error_code(struct interrupt_frame *frame, uint64_t interrupt_code, uint64_t error_code);
-void handle_interrupt_with_error_code(struct interrupt_frame *frame, uint64_t interrupt_code, uint64_t error_code) {
+void handle_interrupt_with_error_code(struct interrupt_frame *frame, u64 interrupt_code, u64 error_code);
+void handle_interrupt_with_error_code(struct interrupt_frame *frame, u64 interrupt_code, u64 error_code) {
 
 #ifdef TEST_MODE
     debug_puts("[!] Interrupt - code ");

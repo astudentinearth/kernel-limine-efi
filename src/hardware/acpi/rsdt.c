@@ -4,23 +4,23 @@
 #include "paging.h"
 #include "string.h"
 #include <stdbool.h>
-#include <stdint.h>
+#include "stdint.h"
 
 const struct RSDT_t *rsdt;
 
 static struct system_tables acpi_table_directory = {
     .apic = NULL, .facp = NULL, .hpet = NULL, .waet = NULL};
 
-uint32_t get_rsdt_entry_count()
+u32 get_rsdt_entry_count()
 {
     return (rsdt->header.length - sizeof(rsdt->header)) / 4;
 }
 
 bool validate_rsdt(const struct ACPI_SDT *rsdt_header)
 {
-    uint8_t sum = 0;
+    u8 sum = 0;
     for (unsigned int i = 0; i < rsdt_header->length; i++) {
-        sum += ((uint8_t *)rsdt_header)[i];
+        sum += ((u8 *)rsdt_header)[i];
     }
     return sum == 0;
 }
@@ -28,8 +28,8 @@ bool validate_rsdt(const struct ACPI_SDT *rsdt_header)
 void memmap_rsdt_entries()
 {
     debug_info("Memory mapping RSDT entries\n");
-    for (uint32_t i = 0; i < get_rsdt_entry_count(); i++) {
-        void *phys_addr = (void *)(uint64_t)(rsdt->other_headers_ptr[i]);
+    for (u32 i = 0; i < get_rsdt_entry_count(); i++) {
+        void *phys_addr = (void *)(u64)(rsdt->other_headers_ptr[i]);
         void *virt_addr = get_virtaddr((void *)phys_addr);
         map_page(phys_addr, virt_addr, IS_PRESENT);
         char signature[5];
@@ -52,7 +52,7 @@ void memmap_rsdt_entries()
 
 void init_rsdt()
 {
-    uintptr_t physical_addr = get_rsdt_address();
+    uptr physical_addr = get_rsdt_address();
     void *virtual_addr = get_virtaddr((void *)physical_addr);
 
     // leave page read-only

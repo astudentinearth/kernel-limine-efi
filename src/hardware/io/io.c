@@ -4,8 +4,8 @@
 
 #define QUEUE_SIZE 512
 static kinterrupt_t queue[QUEUE_SIZE];
-static volatile uint64_t head = 0;
-static volatile uint64_t tail = 0;
+static volatile u64 head = 0;
+static volatile u64 tail = 0;
 kinterrupt_t noop = {
     .payload = NOOP,
     .type = NOOP
@@ -13,7 +13,7 @@ kinterrupt_t noop = {
 
 void queue_interrupt(kinterrupt_t interrupt) {
     __asm__ volatile("cli");
-    uint64_t next = (head+1) % QUEUE_SIZE;
+    u64 next = (head+1) % QUEUE_SIZE;
     if (next == tail) {
         __asm__ volatile("sti");
         return;

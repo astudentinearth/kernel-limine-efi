@@ -24,14 +24,14 @@ void debug_put_int(int64_t num) {
     debug_puts(debug_itoa_buffer);
 }
 
-void debug_put_uint(uint64_t num) {
+void debug_put_uint(u64 num) {
     char debug_itoa_buffer[DEBUG_ITOA_BUFFER_SIZE];
     memset(debug_itoa_buffer, 0, DEBUG_ITOA_BUFFER_SIZE);
     itoa_u(num, debug_itoa_buffer);
     debug_puts(debug_itoa_buffer);
 }
 
-void debug_put_hex(uint64_t num) {
+void debug_put_hex(u64 num) {
     char debug_itoa_buffer[DEBUG_ITOA_BUFFER_SIZE];
     memset(debug_itoa_buffer, 0, DEBUG_ITOA_BUFFER_SIZE);
     itoa_hex(num, debug_itoa_buffer);
@@ -58,17 +58,17 @@ void debug_printf_out(const char* msg, va_list args) {
             switch(fmt) {
                 case 'i':
                 case 'd':
-                    debug_put_int(va_arg(args, uint32_t));
+                    debug_put_int(va_arg(args, u32));
                     continue;
 
                 case 'u':
-                    debug_put_uint(va_arg(args, uint64_t));
+                    debug_put_uint(va_arg(args, u64));
                     continue;
 
                 case 'p':
                 case 'x': //TODO: implement lowercase later
                 case 'X':
-                    debug_put_hex(va_arg(args, uint64_t));
+                    debug_put_hex(va_arg(args, u64));
                     continue;
 
                 case 'c':

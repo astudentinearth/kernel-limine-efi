@@ -15,8 +15,8 @@ void debug_puts(const char* msg);
 
 #define DEBUG_ITOA_BUFFER_SIZE 256
 void debug_put_int(int64_t num);
-void debug_put_uint(uint64_t num);
-void debug_put_hex(uint64_t num);
+void debug_put_uint(u64 num);
+void debug_put_hex(u64 num);
 void debug_newline();
 void panic(const char* message);
 void debug_printf(const char* msg, ...);

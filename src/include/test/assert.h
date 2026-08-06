@@ -1,11 +1,11 @@
 #pragma once
 #include <stdbool.h>
-#include <stdint.h>
+#include "stdint.h"
 #include <stddef.h>
 
 bool _assert_equals_str(const char* file, int line, const char* expected, const char* actual, const char* label);
 bool _assert(const char* file, int line, bool actual, const char* msg);
-bool _assert_equals_uint(const char* file, int line, uint64_t expected, uint64_t actual, const char* label);
+bool _assert_equals_uint(const char* file, int line, u64 expected, u64 actual, const char* label);
 bool _assert_equals_ptr(const char* file, int line, void* expected, void* actual, const char* label);
 void _test_pass(const char* file, int line, const char* msg);
 

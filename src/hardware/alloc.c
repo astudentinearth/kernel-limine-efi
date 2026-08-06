@@ -3,21 +3,21 @@
 #include "hardware/allocator.h"
 #include "hardware/memory.h"
 #include <stdbool.h>
-#include <stdint.h>
+#include "stdint.h"
 
 #define USED true
 #define FREE false
 
 static bool frame_map[MAX_PAGE_COUNT];
-static uint64_t pool_ptr;
-static uint64_t pool_end_ptr;
-static uint64_t max_available_pages;
-static uint64_t total_allocated = 0;
-static uint64_t total = 0;
+static u64 pool_ptr;
+static u64 pool_end_ptr;
+static u64 max_available_pages;
+static u64 total_allocated = 0;
+static u64 total = 0;
 
 
 pageframe_t kalloc_frame(){
-    uint64_t i = 0;
+    u64 i = 0;
     while(frame_map[i] != FREE) {
         i++;
         if(i > max_available_pages) {
@@ -29,18 +29,18 @@ pageframe_t kalloc_frame(){
     return pool_ptr + (i * PAGE_SIZE);
 }
 
-uint64_t get_frame_idx(pageframe_t pframe) {
+u64 get_frame_idx(pageframe_t pframe) {
     return (pframe - pool_ptr) / PAGE_SIZE;
 }
 
 void kfree_frame(pageframe_t pframe) {
-    uint64_t index = get_frame_idx(pframe);
+    u64 index = get_frame_idx(pframe);
     frame_map[index] = FREE;
 }
 
 void init_pmm() {
-    uint64_t pool_start = (uint64_t) get_largest_usable_memory_block();
-    uint64_t size = get_largest_usable_memory_block_size();
+    u64 pool_start = (u64) get_largest_usable_memory_block();
+    u64 size = get_largest_usable_memory_block_size();
 
     // check alignment
     if(pool_start % PAGE_SIZE != 0) {
@@ -54,7 +54,7 @@ void init_pmm() {
 #endif
     }
 
-    uint64_t pool_end = (uintptr_t) pool_start + size;
+    u64 pool_end = (uptr) pool_start + size;
 
     if(pool_end % PAGE_SIZE != 0) {
 #ifdef TEST_MODE
@@ -76,7 +76,6 @@ void init_pmm() {
 #include "test/test.h"
 void test_allocator() {
     debug_printf("Page frame pool start: %p | end: %p\n", pool_ptr, pool_end_ptr);
-    bool pass = true;
 
     describe(
         "pool alignment check",
@@ -90,7 +89,7 @@ void test_allocator() {
     p3 = kalloc_frame();
     p4 = kalloc_frame();
     debug_printf("Allocated frames: %X %X %X %X\n", p1, p2, p3, p4);
-    uint64_t i1, i2, i3, i4;
+    u64 i1, i2, i3, i4;
     i1 = get_frame_idx(p1);
     i2 = get_frame_idx(p2);
     i3 = get_frame_idx(p3);

@@ -1,6 +1,6 @@
 #pragma once
 #include <stdbool.h>
-#include <stdint.h>
+#include "stdint.h"
 bool cpu_has_msr();
-void cpu_get_msr(uint32_t msr, uint32_t *lo, uint32_t *hi);
-void cpu_set_msr(uint32_t msr, uint32_t lo, uint32_t hi);
+void cpu_get_msr(u32 msr, u32 *lo, u32 *hi);
+void cpu_set_msr(u32 msr, u32 lo, u32 hi);

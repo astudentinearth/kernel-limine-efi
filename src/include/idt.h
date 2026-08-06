@@ -1,19 +1,19 @@
 #pragma once
 
-#include <stdint.h>
+#include "stdint.h"
 
 typedef unsigned long long int uword_t;
 
 #define IDT_MAX_DESCRIPTORS 256
 
 struct InterruptDescriptor64 {
-    uint16_t offset_15_0;
-    uint16_t segment_selector;
-    uint8_t ist_offset;
-    uint8_t type_attrs;
-    uint16_t offset_31_16;
-    uint32_t offset_63_32;
-    uint32_t reserved_zero;
+    u16 offset_15_0;
+    u16 segment_selector;
+    u8 ist_offset;
+    u8 type_attrs;
+    u16 offset_31_16;
+    u32 offset_63_32;
+    u32 reserved_zero;
 }__attribute__((packed));
 
 struct interrupt_frame {

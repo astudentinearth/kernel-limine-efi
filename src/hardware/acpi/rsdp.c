@@ -6,16 +6,16 @@
 #include "limine.h"
 #include "paging.h"
 #include <stdbool.h>
-#include <stdint.h>
+#include "stdint.h"
 #include "string.h"
 
 static const struct RSDP_t *rsdp;
 static const struct XSDP_t *xsdp;
-static uint32_t rsdp_revision;
+static u32 rsdp_revision;
 
 bool validate_rsdp(const struct RSDP_t *rsdp) {
-    uint8_t sum = 0;
-    uint8_t *bytes = (uint8_t*)rsdp;
+    u8 sum = 0;
+    u8 *bytes = (u8*)rsdp;
     for(unsigned int i = 0; i < sizeof(struct RSDP_t); i++) {
         sum += bytes[i];
     }
@@ -62,7 +62,7 @@ void limine_init_rsdp() {
 }
 
 /** Returns the **physical** address of the RSDT. */
-uintptr_t get_rsdt_address() {
+uptr get_rsdt_address() {
     return rsdp->rsdt_address;   
 }
 

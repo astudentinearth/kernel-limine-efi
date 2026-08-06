@@ -50,25 +50,25 @@ struct limine_framebuffer *get_limine_framebuffer(int i)
     return framebuffer_request.response->framebuffers[i];
 }
 
-uint64_t get_framebuffer_count()
+u64 get_framebuffer_count()
 {
     return framebuffer_request.response->framebuffer_count;
 }
 
-uint64_t get_hhdm_offset()
+u64 get_hhdm_offset()
 {
     struct limine_hhdm_response *response = hhdm_request.response;
     return response->offset;
 }
 
-uint64_t get_physical_executable_base()
+u64 get_physical_executable_base()
 {
     struct limine_executable_address_response *response =
         executable_address_request.response;
     return response->physical_base;
 }
 
-uint64_t get_virtual_executable_base()
+u64 get_virtual_executable_base()
 {
     struct limine_executable_address_response *response =
         executable_address_request.response;

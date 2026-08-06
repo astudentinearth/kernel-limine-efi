@@ -1,6 +1,6 @@
 #pragma once
 #include <stdbool.h>
-#include <stdint.h>
+#include "stdint.h"
 #define PIC1_8259_COMMAND 0x0020
 #define PIC1_8259_DATA 0x0021
 #define PIC2_8259_COMMAND 0x00A0
@@ -35,39 +35,39 @@ void init_apic();
     (0x10 + 2 * n) // lower-32bits (add +1 for upper 32-bits)
 
 struct io_apic_redirection_entry {
-    uint64_t vector : 8;
-    uint64_t delivery_mode : 3;
-    uint64_t destination_mode : 1;
-    uint64_t delivery_status : 1;
-    uint64_t pin_polarity : 1;
-    uint64_t remote_irr : 1;
-    uint64_t trigger_mode : 1;
-    uint64_t mask : 1;
-    uint64_t reserved : 39;
-    uint64_t destination : 8;
+    u64 vector : 8;
+    u64 delivery_mode : 3;
+    u64 destination_mode : 1;
+    u64 delivery_status : 1;
+    u64 pin_polarity : 1;
+    u64 remote_irr : 1;
+    u64 trigger_mode : 1;
+    u64 mask : 1;
+    u64 reserved : 39;
+    u64 destination : 8;
 } __attribute__((packed));
 
 typedef struct {
-    uint32_t lower;
-    uint32_t upper;
+    u32 lower;
+    u32 upper;
 } io_apic_redirection_entry_t;
 
 typedef struct {
-    uintptr_t phys_addr;
-    uintptr_t virt_addr;
-    uint8_t id;
-    uint64_t global_interrupt_base;
-    uint8_t max_redir_entry_count;
+    uptr phys_addr;
+    uptr virt_addr;
+    u8 id;
+    u64 global_interrupt_base;
+    u8 max_redir_entry_count;
 } io_apic_t;
 
-void setup_ioapic(io_apic_t *apic, void *phys_addr, uint64_t gsib);
-uint32_t read_ioapic_reg(io_apic_t apic, uint8_t offset);
-void write_ioapic_reg(io_apic_t apic, uint8_t offset, uint32_t data);
+void setup_ioapic(io_apic_t *apic, void *phys_addr, u64 gsib);
+u32 read_ioapic_reg(io_apic_t apic, u8 offset);
+void write_ioapic_reg(io_apic_t apic, u8 offset, u32 data);
 
-void read_ioapic_redir_entry(io_apic_t apic, uint8_t n,
+void read_ioapic_redir_entry(io_apic_t apic, u8 n,
                              io_apic_redirection_entry_t *out);
 
-void write_ioapic_redir_entry(io_apic_t apic, uint8_t n,
+void write_ioapic_redir_entry(io_apic_t apic, u8 n,
                               io_apic_redirection_entry_t entry);
 
 io_apic_t *get_default_ioapic();

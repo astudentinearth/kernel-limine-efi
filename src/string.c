@@ -37,7 +37,7 @@ void itoa(int64_t num, char *buf){
 
 }
 
-void itoa_u(uint64_t num, char *buf){
+void itoa_u(u64 num, char *buf){
     if(num == 0) {
         buf[0] = '0';
         buf[1] = 0;
@@ -49,7 +49,7 @@ void itoa_u(uint64_t num, char *buf){
 
     // convert to digits in reverse
     while(num > 0) {
-        uint64_t remainder = num % 10;
+        u64 remainder = num % 10;
         num /= 10;
         *cur++ = digit_to_ascii(remainder);
         digit_count++;
@@ -66,7 +66,7 @@ void itoa_u(uint64_t num, char *buf){
 
 }
 
-void itoa_hex(uint64_t num, char *buf) {
+void itoa_hex(u64 num, char *buf) {
 
     if(num == 0) {
         buf[0] = '0';
@@ -79,7 +79,7 @@ void itoa_hex(uint64_t num, char *buf) {
 
     // convert to digits in reverse
     while(num > 0) {
-        uint64_t remainder = num % 16;
+        u64 remainder = num % 16;
         num /= 16;
         *cur++ = digit_to_ascii(remainder);
         digit_count++;

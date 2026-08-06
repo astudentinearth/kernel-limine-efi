@@ -1,2 +1,2 @@
 CompileFlags:
-  Add: ["-DTEST_MODE", "-Iinclude", -nostdlibinc, -ffreestanding]
+  Add: ["-DTEST_MODE", "-Iinclude", -nostdlibinc, -ffreestanding, -std=gnu11, -xc]

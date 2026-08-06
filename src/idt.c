@@ -4,7 +4,7 @@
 #include "gdt.h"
 #include <stdbool.h>
 
-extern void load_idt(uint16_t size, uint64_t offset);
+extern void load_idt(u16 size, u64 offset);
 extern void *isr_stub_table[];
 extern void trigger_gp();
 
@@ -12,15 +12,15 @@ static bool vectors[IDT_MAX_DESCRIPTORS];
 
 __attribute__((aligned(0x10))) static struct InterruptDescriptor64 idt[255];
 
-void idt_set_descriptor(uint8_t vector, void *isr, uint8_t flags) {
+void idt_set_descriptor(u8 vector, void *isr, u8 flags) {
   struct InterruptDescriptor64 *descriptor = &idt[vector];
 
-  descriptor->offset_15_0 = (uint64_t)isr & 0xFFFF;
+  descriptor->offset_15_0 = (u64)isr & 0xFFFF;
   descriptor->segment_selector = KERNEL_CODE_SEGMENT_OFFSET;
   descriptor->ist_offset = 0;
   descriptor->type_attrs = flags;
-  descriptor->offset_31_16 = ((uint64_t)isr >> 16) & 0xFFFF;
-  descriptor->offset_63_32 = ((uint64_t)isr >> 32) & 0xFFFFFFFF;
+  descriptor->offset_31_16 = ((u64)isr >> 16) & 0xFFFF;
+  descriptor->offset_63_32 = ((u64)isr >> 32) & 0xFFFFFFFF;
   descriptor->reserved_zero = 0;
 }
 
@@ -28,10 +28,10 @@ void setup_idt() {
 #ifdef TEST_MODE
     debug("Setting up IDT");
 #endif
-  uint16_t limit = sizeof(struct InterruptDescriptor64) * IDT_MAX_DESCRIPTORS;
-  uint64_t base = (uint64_t)&idt[0];
+  u16 limit = sizeof(struct InterruptDescriptor64) * IDT_MAX_DESCRIPTORS;
+  u64 base = (u64)&idt[0];
 
-  for (uint16_t vector = 0; vector < IDT_MAX_DESCRIPTORS; vector++) {
+  for (u16 vector = 0; vector < IDT_MAX_DESCRIPTORS; vector++) {
     idt_set_descriptor(vector, isr_stub_table[vector], 0x8E);
     vectors[vector] = true;
   }

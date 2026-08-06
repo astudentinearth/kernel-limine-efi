@@ -21,9 +21,9 @@ char us_qwerty[256] = US_QWERTY;
 char us_qwerty_low[256] = US_QWERTY_LOWERCASE;
 
 bool shift_down = false;
-extern uint8_t ps2_kbd_scancode_cmd(uint8_t subcommand);
+extern u8 ps2_kbd_scancode_cmd(u8 subcommand);
 
-void process_keyboard_event(uint8_t scancode) {
+void process_keyboard_event(u8 scancode) {
     char ch = shift_down ? us_qwerty[scancode] : us_qwerty_low[scancode];
     if(scancode == 0x36 || scancode == 0x2A) {
         shift_down = true;
@@ -40,7 +40,7 @@ void process_keyboard_event(uint8_t scancode) {
     }
 }
 
-void keyboard_interrupt(uint8_t scancode) {
+void keyboard_interrupt(u8 scancode) {
     kinterrupt_t i = {
         .type = KEYBOARD_INT,
         .payload = scancode
@@ -58,8 +58,8 @@ void setup_keyboard() {
 read_ioapic_redir_entry(*apic, KEYBOARD_IRQ, &readback);
 debug_info("redir low: %x high: %x\n", readback.lower, readback.upper);
     debug_info("Set keyboard up!\n");
-    uint8_t set_response = ps2_kbd_scancode_cmd(1);
-    uint8_t b = ps2_kbd_scancode_cmd(0);
+    u8 set_response = ps2_kbd_scancode_cmd(1);
+    u8 b = ps2_kbd_scancode_cmd(0);
     debug_info("%x %x\n", set_response,b);
 }
 

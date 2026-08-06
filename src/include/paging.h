@@ -1,5 +1,5 @@
 #pragma once
-#include <stdint.h>
+#include "stdint.h"
 
 // page tree offsets
 #define PML4_IDX(virt) (virt >> 39) & 0x1FF
@@ -19,8 +19,8 @@
 
 void init_paging();
 void* get_virtaddr(void* phys_addr);
-void* get_physaddr(void* virt_addr, uint64_t *pml4);
-uint64_t* get_active_pml4();
+void* get_physaddr(void* virt_addr, u64 *pml4);
+u64* get_active_pml4();
 
-void map_page(void *physical_address, void *virtual_address, uint32_t flags);
+void map_page(void *physical_address, void *virtual_address, u32 flags);
 

@@ -5,10 +5,10 @@
 #include "limine.h"
 #include <stddef.h>
 
-static uint64_t memmap_entry_count;
+static u64 memmap_entry_count;
 static bool memmap_initialized = false;
 static void *largest_memory_block_start;
-static uint64_t largest_memory_block_size;
+static u64 largest_memory_block_size;
 
 static MemoryMapEntry_t memmap_entries[MAX_MEMMAP_ENTRIES];
 
@@ -59,7 +59,7 @@ void load_limine_memmap_entries()
     struct limine_memmap_response *memmap_response = get_limine_memmap();
     memmap_entry_count = memmap_response->entry_count;
 
-    for (uint64_t i = 0; i < memmap_entry_count; i++) {
+    for (u64 i = 0; i < memmap_entry_count; i++) {
         memmap_entries[i] = map_limine_entry(memmap_response->entries[i]);
     }
 }
@@ -69,7 +69,7 @@ void init_memory_map()
     load_limine_memmap_entries();
 
     MemoryMapEntry_t largest = memmap_entries[0];
-    for (uint64_t i = 1; i < memmap_entry_count; i++) {
+    for (u64 i = 1; i < memmap_entry_count; i++) {
         MemoryMapEntry_t current = memmap_entries[i];
         if (current.type != USABLE) { continue; }
         if (current.length > largest.length) { largest = current; }
@@ -83,18 +83,18 @@ void init_memory_map()
     memmap_initialized = true;
 }
 
-uint64_t get_usable_memory()
+u64 get_usable_memory()
 {
     if (!memmap_initialized) { init_memory_map(); }
-    uint64_t result = 0;
-    for (uint64_t i = 0; i < memmap_entry_count; i++) {
+    u64 result = 0;
+    for (u64 i = 0; i < memmap_entry_count; i++) {
         if (memmap_entries[i].type != USABLE) { continue; }
         result += memmap_entries[i].length;
     }
     return result;
 }
 
-uint64_t get_memmap_entry_count() { return memmap_entry_count; }
+u64 get_memmap_entry_count() { return memmap_entry_count; }
 
 void *get_largest_usable_memory_block()
 {
@@ -105,7 +105,7 @@ void *get_largest_usable_memory_block()
 
 MemoryMapEntry_t *get_framebuffer(int n)
 {
-    for (uint64_t i = 0; i < memmap_entry_count; i++) {
+    for (u64 i = 0; i < memmap_entry_count; i++) {
         MemoryMapEntry_t *entry = &memmap_entries[i];
         if (entry->type != FRAMEBUFFER) { continue; }
         if (n == 0) { return entry; }
@@ -114,7 +114,7 @@ MemoryMapEntry_t *get_framebuffer(int n)
     return NULL;
 }
 
-uint64_t get_largest_usable_memory_block_size()
+u64 get_largest_usable_memory_block_size()
 {
     if (memmap_initialized) { return largest_memory_block_size; }
     init_memory_map();
@@ -167,19 +167,19 @@ static void dump_memory_entry(MemoryMapEntry_t *entry)
 void dump_memory_info()
 {
     if (!memmap_initialized) { init_memory_map(); }
-    uint64_t usable_memory = get_usable_memory();
+    u64 usable_memory = get_usable_memory();
 
     debug("[[[ BEGIN MEMORY INFO ]]]]");
     debug_printf("Usable memory: %u bytes \n", usable_memory);
 
-    for (uint64_t i = 0; i < memmap_entry_count; i++) {
+    for (u64 i = 0; i < memmap_entry_count; i++) {
         dump_memory_entry(&memmap_entries[i]);
     }
 
     debug_printf("---\n");
     debug_printf("Kernel address | Physical: %p | Virtual: %p\n",
                  get_physical_executable_base(), get_virtual_executable_base());
-    debug_printf("Kernel end (per linker symbol): %p\n", (uint64_t)_kernel_end);
+    debug_printf("Kernel end (per linker symbol): %p\n", (u64)_kernel_end);
     debug_printf("HHDM offset: %p\n", get_hhdm_offset());
     debug_printf("---\n");
     debug_puts("\n[[[ END MEMORY INFO ]]]\n");

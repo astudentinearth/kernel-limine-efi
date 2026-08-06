@@ -1,5 +1,5 @@
 #pragma once
-#include <stdint.h>
+#include "stdint.h"
 void setup_gdt();
 
 
@@ -16,40 +16,40 @@ void setup_gdt();
 #define IST1_SIZE 4096
 
 struct system_segment_descriptor {
-    uint32_t reserved;
-    uint32_t base_63_32;
-    uint8_t base_31_24;
-    uint8_t flags_limit;
-    uint8_t access_byte;
-    uint8_t base_23_16;
-    uint8_t base_15_0;
-    uint8_t limit;
+    u32 reserved;
+    u32 base_63_32;
+    u8 base_31_24;
+    u8 flags_limit;
+    u8 access_byte;
+    u8 base_23_16;
+    u8 base_15_0;
+    u8 limit;
 }__attribute__((packed));
 
 struct TSS {
-    uint32_t reserved_0;
-    uint64_t rsp0;
-    uint64_t rsp1;
-    uint64_t rsp2;
-    uint64_t reserved_1;
-    uint64_t ist1;
-    uint64_t ist2;
-    uint64_t ist3;
-    uint64_t ist4;
-    uint64_t ist5;
-    uint64_t ist6;
-    uint64_t ist7;
-    uint64_t reserved_2;
-    uint16_t reserved_3;
-    uint16_t iopb;
+    u32 reserved_0;
+    u64 rsp0;
+    u64 rsp1;
+    u64 rsp2;
+    u64 reserved_1;
+    u64 ist1;
+    u64 ist2;
+    u64 ist3;
+    u64 ist4;
+    u64 ist5;
+    u64 ist6;
+    u64 ist7;
+    u64 reserved_2;
+    u16 reserved_3;
+    u16 iopb;
 }__attribute__((packed));
 
 struct GDT {
-    uint64_t null_descriptor;
-    uint64_t kernel_cs;
-    uint64_t kernel_data;
-    uint64_t user_data;
-    uint64_t user_code;
+    u64 null_descriptor;
+    u64 kernel_cs;
+    u64 kernel_data;
+    u64 user_data;
+    u64 user_code;
     struct system_segment_descriptor ssd;
 };
 

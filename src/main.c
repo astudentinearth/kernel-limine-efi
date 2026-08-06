@@ -12,7 +12,7 @@
 #include "test/test.h"
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
+#include "stdint.h"
 #include "hardware/io.h"
 
 static void hcf(void)
