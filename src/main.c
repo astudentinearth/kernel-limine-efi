@@ -65,16 +65,5 @@ void kmain(void)
     setup_keyboard();
     enable_hardware_interrupts();
     probe_pci();
-
-#ifdef TEST_MODE
-
-    PMMStats_t stats;
-    memset(&stats, 0, sizeof(PMMStats_t));
-    get_pmm_stats(&stats);
-    debug_info(
-        "== Page stats\nTotal pages: %u\nMapped pages: %u\nPage size: %u\nBitmap iterations: %u\n",
-        stats.total_count, stats.mapped_count, stats.page_size, get_total_iter());
-#endif
-
     hcf();
 }

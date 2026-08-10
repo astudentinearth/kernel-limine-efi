@@ -23,4 +23,5 @@ typedef struct {
 } PMMStats_t;
 
 void get_pmm_stats(PMMStats_t* stats);
+void debug_print_vm_stats();
 u64 get_total_iter();

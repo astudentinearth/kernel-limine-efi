@@ -1,5 +1,6 @@
 
 #include "debug.h"
+#include "hardware/allocator.h"
 #include "hardware/io.h"
 #include "hardware/pic.h"
 #include "idt.h"
@@ -25,6 +26,9 @@ extern u8 ps2_kbd_scancode_cmd(u8 subcommand);
 
 void process_keyboard_event(u8 scancode) {
     char ch = shift_down ? us_qwerty[scancode] : us_qwerty_low[scancode];
+    if(scancode == 0x3D) {
+        debug_print_vm_stats();
+    }
     if(scancode == 0x36 || scancode == 0x2A) {
         shift_down = true;
     } 

@@ -6,6 +6,7 @@
 struct PageMeta {
     usize block_size;
     u64 total_allocated;
+    /** unused, kept for future page-level free list */
     struct PageMeta *next_page;
     uptr next_free;
 };
@@ -150,7 +151,21 @@ void *kmalloc(usize size)
     return fixed_alloc(bs);
 }
 
-void kfree(void *ptr) {}
+void kfree(void *ptr) {
+    uptr page_ptr = INFER_PAGE((uptr)ptr);
+    struct PageMeta *page = (struct PageMeta*)page_ptr;
+   
+    // page can be released
+    if(page->total_allocated == 1) {
+        kfree_vframe(page);
+        return;
+    }
+
+    uptr free_list_head = page->next_free;
+    *(uptr*)ptr = free_list_head;
+    page->next_free = (uptr)ptr;
+    page->total_allocated--;
+}
 
 #ifdef TEST_MODE
 #include "debug.h"
