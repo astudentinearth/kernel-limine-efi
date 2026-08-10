@@ -71,14 +71,13 @@ struct PageMeta *initialize_page(void *_page_ptr, usize bs)
     return meta;
 }
 
-struct PageMeta *get_page_for_bucket(usize bs)
+struct PageMeta **get_page_for_bucket(usize bs)
 {
     bs = round_up(bs);
     if (bs == BLOCK_TOO_BIG) {
         return NULL; // reroute to a different allocator
     }
     struct PageMeta **result;
-    debug_info("rounded block size: %u\n", bs);
     switch (bs) {
     case 8:
         result = &free_8;
@@ -117,17 +116,39 @@ struct PageMeta *get_page_for_bucket(usize bs)
         break;
     }
 
-    debug_info("existing page: %x\n", *result);
-    if (*result != NULL) { return *result; }
+    if (*result != NULL) { return result; }
 
     void *new_frame = kalloc_vframe();
-    debug_info("new frame: %x\n", new_frame);
     struct PageMeta *meta = initialize_page(new_frame, bs);
     *result = meta;
-    return meta;
+    return result;
 }
 
-void *kmalloc(usize size) {}
+void *fixed_alloc(usize bs)
+{
+    struct PageMeta **bucket = get_page_for_bucket(bs);
+    struct PageMeta *page = *bucket;
+    uptr current_free = page->next_free;
+    uptr next_free = *(uptr *)current_free;
+
+    page->total_allocated++;
+    page->next_free = next_free;
+
+    if (next_free == NULL) {
+        *bucket = NULL; 
+    }
+
+    return (void *)current_free;
+}
+
+void *kmalloc(usize size)
+{
+    usize bs = round_up(size);
+    if (bs == BLOCK_TOO_BIG) {
+        return NULL; // route to multi page allocator
+    }
+    return fixed_alloc(bs);
+}
 
 void kfree(void *ptr) {}
 
@@ -135,9 +156,8 @@ void kfree(void *ptr) {}
 #include "debug.h"
 #include "test/assert.h"
 
-void print_free_1024_addr() {
-    debug_err("free_1024 addr: %x value: %x\n", &free_1024, free_1024);
-}
+void print_free_1024_addr()
+{ debug_err("free_1024 addr: %x value: %x\n", &free_1024, free_1024); }
 
 void test_malloc()
 {
@@ -208,27 +228,69 @@ void test_malloc()
     }
 
     // test frame retrieval
-    
 
-    for (int i = 0; i < BUCKET_COUNT ; i++) {
+    for (int i = 0; i < BUCKET_COUNT; i++) {
         usize bs = block_sizes[i];
         debug_info(">>> Testing page retrieval with %u block size\n", bs);
-        struct PageMeta *frame = get_page_for_bucket(bs);
-        debug_info("run describe, frame: %x\n", frame);
+        struct PageMeta *frame = *get_page_for_bucket(bs);
         describe("page retrieval tests",
                  assert(frame != NULL, "frame is not null"),
                  assert_equals_uint(bs, frame->block_size,
                                     "frame has correct block size"));
     }
+
+    debug_info("Re-running with existing lists\n");
+
     for (int i = 0; i < BUCKET_COUNT; i++) {
         usize bs = block_sizes[i];
         debug_info(">>> Testing page retrieval with %u block size\n", bs);
-        struct PageMeta *frame = get_page_for_bucket(bs);
-        debug_info("run describe, frame: %x\n", frame);
+        struct PageMeta *frame = *get_page_for_bucket(bs);
         describe("page retrieval tests",
                  assert(frame != NULL, "frame is not null"),
                  assert_equals_uint(bs, frame->block_size,
                                     "frame has correct block size"));
+    }
+
+    // test fixed_alloc
+    for (int i = 0; i < BUCKET_COUNT; i++) {
+        usize bs = block_sizes[i];
+        debug_info(">>> Testing fixed_alloc for %u block size\n", bs);
+        struct PageMeta *frame = *get_page_for_bucket(bs);
+        usize initial_allocated = frame->total_allocated;
+        void *expected_ptr = (void *)frame->next_free;
+        uptr expected_head = *((uptr *)expected_ptr);
+        void *ptr = fixed_alloc(bs);
+        describe(
+            "fixed_alloc",
+            assert_equals_uint(initial_allocated + 1, frame->total_allocated,
+                               "allocates a slot"),
+            assert_equals_ptr(expected_ptr, ptr,
+                              "allocates the next free slot"),
+            assert_equals_ptr((void *)expected_head, (void *)frame->next_free,
+                              "updates the free list correctly")
+
+        );
+    }
+
+    // test filling behavior
+    // a new page must be initialized because the previous tests guarantee
+    // at least one full slot in each page
+    for (int i = 0; i < BUCKET_COUNT; i++) {
+        usize bs = block_sizes[i];
+        struct PageMeta **bucket_ptr = get_page_for_bucket(bs);
+        struct PageMeta *initial_frame = *bucket_ptr;
+        usize block_count =  BLOCK_COUNT(**bucket_ptr);
+        for (usize j = 0; j < block_count; j++) fixed_alloc(bs);
+        describe("fixed_alloc page rotation",
+                 assert_equals_uint(BLOCK_COUNT(*initial_frame),
+                                    initial_frame->total_allocated,
+                                    "the first page has all slots allocated"),
+                 assert_equals_ptr(
+                     NULL, (void *)initial_frame->next_free,
+                     "internal free list head is NULL after page filled up"),
+
+                 assert(initial_frame != *bucket_ptr,
+                        "switched frame head to a different page"));
     }
 }
 
