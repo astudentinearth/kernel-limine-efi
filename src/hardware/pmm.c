@@ -3,6 +3,7 @@
 #include "hardware/allocator.h"
 #include "hardware/memory.h"
 #include <stdbool.h>
+#include "paging.h"
 #include "stdint.h"
 
 #define USED true
@@ -34,6 +35,10 @@ pageframe_t kalloc_frame(){
     return pool_ptr + (last_allocated * PAGE_SIZE);
 }
 
+void* kalloc_vframe() {
+    return get_virtaddr((void*)kalloc_frame());
+}
+
 u64 get_frame_idx(pageframe_t pframe) {
     return (pframe - pool_ptr) / PAGE_SIZE;
 }
@@ -42,6 +47,11 @@ void kfree_frame(pageframe_t pframe) {
     u64 index = get_frame_idx(pframe);
     frame_map[index] = FREE;
     total_allocated_pages--;
+}
+
+void kfree_vframe(void* vframe) {
+    void* phys_addr = get_physaddr(vframe, get_active_pml4());
+    kfree_frame((pageframe_t) phys_addr);
 }
 
 void get_pmm_stats(PMMStats_t *stats) {

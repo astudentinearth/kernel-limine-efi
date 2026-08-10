@@ -7,7 +7,9 @@
 typedef u64 pageframe_t;
 
 pageframe_t kalloc_frame();
+void* kalloc_vframe();
 void kfree_frame(pageframe_t frame);
+void kfree_vframe(void* vframe);
 
 void init_pmm();
 

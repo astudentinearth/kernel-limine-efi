@@ -59,7 +59,6 @@ void kmain(void)
     setup_keyboard();
     enable_hardware_interrupts();
     probe_pci();
-    test_malloc();
 
 #ifdef TEST_MODE
 
