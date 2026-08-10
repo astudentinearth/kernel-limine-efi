@@ -1,5 +1,7 @@
 
 #include "test/test.h"
+#include "debug.h"
+#include "test/assert.h"
 
 void run_tests(){
     #ifdef TEST_MODE
