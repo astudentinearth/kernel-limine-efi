@@ -56,8 +56,10 @@ SECTIONS
     /* If you need, for example, .init_array and .fini_array, those should be placed */
     /* above this. */
     .bss : {
+        _bss_start = .;
         *(.bss .bss.*)
         *(COMMON)
+        _bss_end = .;
     } :data
 
     _kernel_end = .;

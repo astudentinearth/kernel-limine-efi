@@ -15,6 +15,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+extern u8 _bss_start[];
+extern u8 _bss_end[];
+
 static void hcf(void)
 {
     asm("hlt");
@@ -24,9 +27,12 @@ static void hcf(void)
     }
 }
 
+
 extern void enable_hardware_interrupts();
+
 void kmain(void)
 {
+    memset(_bss_start, 0, (uptr)_bss_end - (uptr)_bss_start);
     // Ensure the bootloader actually understands our base revision (see spec).
     if (!is_base_revision_supported() || !limine_framebuffer_available()) {
         hcf();

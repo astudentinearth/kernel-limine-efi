@@ -78,6 +78,7 @@ struct PageMeta *get_page_for_bucket(usize bs)
         return NULL; // reroute to a different allocator
     }
     struct PageMeta **result;
+    debug_info("rounded block size: %u\n", bs);
     switch (bs) {
     case 8:
         result = &free_8;
@@ -116,9 +117,11 @@ struct PageMeta *get_page_for_bucket(usize bs)
         break;
     }
 
+    debug_info("existing page: %x\n", *result);
     if (*result != NULL) { return *result; }
 
     void *new_frame = kalloc_vframe();
+    debug_info("new frame: %x\n", new_frame);
     struct PageMeta *meta = initialize_page(new_frame, bs);
     *result = meta;
     return meta;
@@ -132,9 +135,13 @@ void kfree(void *ptr) {}
 #include "debug.h"
 #include "test/assert.h"
 
+void print_free_1024_addr() {
+    debug_err("free_1024 addr: %x value: %x\n", &free_1024, free_1024);
+}
+
 void test_malloc()
 {
-
+    print_free_1024_addr();
     {
         pageframe_t test_frame = kalloc_frame();
         struct PageMeta test_meta = {.next_page = NULL,
@@ -201,16 +208,27 @@ void test_malloc()
     }
 
     // test frame retrieval
+    
 
-    for (int i = 0; i < BUCKET_COUNT; i++) {
+    for (int i = 0; i < BUCKET_COUNT ; i++) {
         usize bs = block_sizes[i];
         debug_info(">>> Testing page retrieval with %u block size\n", bs);
         struct PageMeta *frame = get_page_for_bucket(bs);
+        debug_info("run describe, frame: %x\n", frame);
         describe("page retrieval tests",
                  assert(frame != NULL, "frame is not null"),
                  assert_equals_uint(bs, frame->block_size,
                                     "frame has correct block size"));
-        kfree_vframe(frame);
+    }
+    for (int i = 0; i < BUCKET_COUNT; i++) {
+        usize bs = block_sizes[i];
+        debug_info(">>> Testing page retrieval with %u block size\n", bs);
+        struct PageMeta *frame = get_page_for_bucket(bs);
+        debug_info("run describe, frame: %x\n", frame);
+        describe("page retrieval tests",
+                 assert(frame != NULL, "frame is not null"),
+                 assert_equals_uint(bs, frame->block_size,
+                                    "frame has correct block size"));
     }
 }
 

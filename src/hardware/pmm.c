@@ -25,7 +25,11 @@ u64 get_total_iter() { return total_iter; }
 pageframe_t kalloc_frame(){
     while(frame_map[last_allocated] != FREE) {
         last_allocated++;
-        total_iter++;
+        // return to start to try and find a free page
+        if(last_allocated > max_available_pages) last_allocated = 0;
+    } 
+    while(frame_map[last_allocated] != FREE) {
+        last_allocated++;
         if(last_allocated > max_available_pages) {
             panic("Out of physical pages.");
         }
@@ -97,7 +101,7 @@ void init_pmm() {
 #include "test/assert.h"
 #include "test/test.h"
 void test_allocator() {
-    debug_printf("Page frame pool start: %p | end: %p\n", pool_ptr, pool_end_ptr);
+    debug_printf("Page frame pool start: %p | end: %p\n", get_virtaddr((void*) pool_ptr ), pool_end_ptr);
 
     describe(
         "pool alignment check",

@@ -10,7 +10,7 @@ extern void trigger_gp();
 
 static bool vectors[IDT_MAX_DESCRIPTORS];
 
-__attribute__((aligned(0x10))) static struct InterruptDescriptor64 idt[255];
+__attribute__((aligned(0x10))) static struct InterruptDescriptor64 idt[IDT_MAX_DESCRIPTORS];
 
 void idt_set_descriptor(u8 vector, void *isr, u8 flags) {
   struct InterruptDescriptor64 *descriptor = &idt[vector];
