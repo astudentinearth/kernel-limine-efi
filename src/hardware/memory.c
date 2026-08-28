@@ -1,8 +1,8 @@
 
 #include "hardware/memory.h"
+#include "boot/limine.h"
 #include "boot/limine_requests.h"
 #include "debug.h"
-#include "boot/limine.h"
 #include <stddef.h>
 
 static u64 memmap_entry_count;

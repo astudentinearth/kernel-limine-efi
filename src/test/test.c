@@ -3,8 +3,9 @@
 #include "debug.h"
 #include "test/assert.h"
 
-void run_tests(){
-    #ifdef TEST_MODE
+void run_tests()
+{
+#ifdef TEST_MODE
     test_memcpy();
     test_string_h();
     test_allocator();
@@ -12,5 +13,5 @@ void run_tests(){
     test_malloc();
     print_test_report();
     debug_printf("[DEBUG] CR3=%p | CR4=%p\n", get_cr3(), get_cr4());
-    #endif
+#endif
 }

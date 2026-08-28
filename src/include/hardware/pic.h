@@ -1,6 +1,6 @@
 #pragma once
-#include <stdbool.h>
 #include "stdint.h"
+#include <stdbool.h>
 #define PIC1_8259_COMMAND 0x0020
 #define PIC1_8259_DATA 0x0021
 #define PIC2_8259_COMMAND 0x00A0
@@ -23,7 +23,6 @@ void init_apic();
 #define IOAPIC_DELIVERY_MODE_NMI 4
 #define IOAPIC_DELIVERY_MODE_INIT 5
 #define IOAPIC_DELIVERY_MODE_EXTINIT 7
-
 
 #define IOAPIC_DESTINATION_MODE_PHYSICAL 0
 #define IOAPIC_DESTINATION_MODE_LOGICAL 1

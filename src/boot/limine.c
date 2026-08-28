@@ -42,19 +42,13 @@ __attribute__((
         ".limine_requests_end"))) static volatile LIMINE_REQUESTS_END_MARKER;
 
 bool limine_framebuffer_available()
-{
-    return framebuffer_request.response != NULL && get_framebuffer_count() > 0;
-}
+{ return framebuffer_request.response != NULL && get_framebuffer_count() > 0; }
 
 struct limine_framebuffer *get_limine_framebuffer(int i)
-{
-    return framebuffer_request.response->framebuffers[i];
-}
+{ return framebuffer_request.response->framebuffers[i]; }
 
 u64 get_framebuffer_count()
-{
-    return framebuffer_request.response->framebuffer_count;
-}
+{ return framebuffer_request.response->framebuffer_count; }
 
 u64 get_hhdm_offset()
 {
@@ -77,18 +71,16 @@ u64 get_virtual_executable_base()
 }
 
 struct limine_memmap_response *get_limine_memmap()
-{
-    return memmap_request.response;
-}
+{ return memmap_request.response; }
 
-struct limine_rsdp_response* get_limine_rsdp() {
-    return rsdp_request.response;
-}
+struct limine_rsdp_response *get_limine_rsdp() { return rsdp_request.response; }
 
 bool is_base_revision_supported() { return LIMINE_BASE_REVISION_SUPPORTED; }
 
-
-uptr limine_get_rsdp_base() {
-    if(rsdp_request.response == NULL) panic("Limine RSDP response is null.");
+uptr limine_get_rsdp_base()
+{
+    if (rsdp_request.response == NULL) {
+        panic("Limine RSDP response is null.");
+    }
     return rsdp_request.response->address;
 }

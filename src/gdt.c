@@ -12,19 +12,18 @@ static struct GDT gdt;
 static struct TSS tss;
 static struct system_segment_descriptor ssd;
 
-void setup_gdt() {
+void setup_gdt()
+{
     gdt.kernel_cs = KERNEL_CS;
     gdt.kernel_data = KERNEL_DATA;
     gdt.user_data = USER_DATA;
     gdt.user_code = USER_CODE;
     gdt.null_descriptor = NULL_DESCRIPTOR;
 
-
     tss.iopb = sizeof(struct TSS);
 
     u8 *kernel_stack_start = kernel_stack + RSP0_SIZE;
     u8 *ist1_stact_start = ist1_stack + IST1_SIZE;
-    
 
     tss.rsp0 = (u64)kernel_stack_start;
     tss.ist1 = (u64)ist1_stact_start;
@@ -41,7 +40,7 @@ void setup_gdt() {
     gdt.ssd = ssd;
 
     set_gdt(sizeof(struct GDT), (u64)&gdt);
-    
+
 #ifdef TEST_MODE
     debug("####\nGDT set.");
     debug_puts("Kernel stack address: 0x");
@@ -52,6 +51,4 @@ void setup_gdt() {
     debug_put_hex((u64)&gdt);
     debug("\n####");
 #endif
-
 }
-

@@ -23,4 +23,4 @@ typedef struct {
 
 PSF_font get_font();
 void psf_init();
-u8* get_char(unsigned char c);
+u8 *get_char(unsigned char c);

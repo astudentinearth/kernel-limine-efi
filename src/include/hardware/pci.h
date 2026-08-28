@@ -1,7 +1,6 @@
 #pragma once
 #include "stdint.h"
-u16 pci_config_read_word(u8 bus, u8 slot, u8 func,
-                              u8 offset);
+u16 pci_config_read_word(u8 bus, u8 slot, u8 func, u8 offset);
 
 u16 pci_check_vendor(u8 bus, u8 slot);
 
@@ -27,13 +26,10 @@ u16 pci_check_vendor(u8 bus, u8 slot);
 #define PCI_BAR4_OFFSET 0x20
 #define PCI_BAR5_OFFSET 0x24
 
-
 // vendors
 #define PCI_VENDOR_NONEXISTENT_DEVICE 0xFFFF
 
 void probe_pci();
-
-
 
 typedef struct {
     u16 bus;

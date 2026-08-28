@@ -30,8 +30,7 @@ char *get_pci_class_name(u8 class)
     return pci_classes[class];
 }
 
-u16 pci_config_read_word(u8 bus, u8 slot, u8 func,
-                              u8 offset)
+u16 pci_config_read_word(u8 bus, u8 slot, u8 func, u8 offset)
 {
     u32 address;
     u32 lbus = (u32)bus;
@@ -40,14 +39,13 @@ u16 pci_config_read_word(u8 bus, u8 slot, u8 func,
     u32 loffset = (u32)offset;
 
     address = (u32)((lbus << 16) | (lslot << 11) | (lfunc << 8) |
-                         (loffset & 0xFC) | ((u32)0x80000000));
+                    (loffset & 0xFC) | ((u32)0x80000000));
 
     outl(PCI_CONFIG_ADDRESS, address);
     return ((u16)((inl(PCI_CONFIG_DATA) >> ((offset & 2) * 8)) & 0xFFFF));
 }
 
-u32 pci_read_base_address(u8 bus, u8 slot, u8 func,
-                               u8 offset)
+u32 pci_read_base_address(u8 bus, u8 slot, u8 func, u8 offset)
 {
     u16 low = pci_config_read_word(bus, slot, func, offset);
     u16 high = pci_config_read_word(bus, slot, func, offset + 2);
@@ -56,9 +54,7 @@ u32 pci_read_base_address(u8 bus, u8 slot, u8 func,
 }
 
 u16 pci_get_vendor(u8 bus, u8 slot, u8 function)
-{
-    return pci_config_read_word(bus, slot, function, PCI_VENDOR_ID_OFFSET);
-}
+{ return pci_config_read_word(bus, slot, function, PCI_VENDOR_ID_OFFSET); }
 
 u8 pci_get_header_type(u8 bus, u8 slot, u8 function)
 {
@@ -68,9 +64,7 @@ u8 pci_get_header_type(u8 bus, u8 slot, u8 function)
 
 /** low 8 bits is subclass, high 6 bits is class */
 u16 pci_get_class_info(u8 bus, u8 slot, u8 function)
-{
-    return pci_config_read_word(bus, slot, function, PCI_SUBCLASS_OFFSET);
-}
+{ return pci_config_read_word(bus, slot, function, PCI_SUBCLASS_OFFSET); }
 
 void dump_bars(u8 bus, u8 slot, u8 function)
 {
@@ -80,8 +74,8 @@ void dump_bars(u8 bus, u8 slot, u8 function)
     u32 bar3 = pci_read_base_address(bus, slot, function, PCI_BAR3_OFFSET);
     u32 bar4 = pci_read_base_address(bus, slot, function, PCI_BAR4_OFFSET);
     u32 bar5 = pci_read_base_address(bus, slot, function, PCI_BAR5_OFFSET);
-    debug_info("pci: ^Base addresses | %x | %x | %x | %x | %x | %x\n", bar0, bar1,
-               bar2, bar3, bar4, bar5);
+    debug_info("pci: ^Base addresses | %x | %x | %x | %x | %x | %x\n", bar0,
+               bar1, bar2, bar3, bar4, bar5);
 }
 
 void check_device(u8 bus, u8 slot)

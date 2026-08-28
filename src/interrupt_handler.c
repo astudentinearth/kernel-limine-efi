@@ -4,8 +4,9 @@
 #include "debug.h"
 #endif
 
-static inline void dump_frame(struct interrupt_frame *frame) {
-    #ifdef TEST_MODE
+static inline void dump_frame(struct interrupt_frame *frame)
+{
+#ifdef TEST_MODE
     debug("[[[ BEGIN INTERRUPT FRAME DUMP ]]]");
     debug_puts("Interrupt frame: ");
     debug_put_hex((u64)frame);
@@ -21,24 +22,28 @@ static inline void dump_frame(struct interrupt_frame *frame) {
     debug_put_hex(frame->sp);
     debug_puts("\n");
     debug("[[[ END INTERRUPT FRAME DUMP ]]]");
-    #endif
+#endif
 }
 
-__attribute__((noreturn))
-void handle_interrupt(struct interrupt_frame *frame, u64 interrupt_code);
-void handle_interrupt(struct interrupt_frame *frame, u64 interrupt_code) {
+__attribute__((noreturn)) void handle_interrupt(struct interrupt_frame *frame,
+                                                u64 interrupt_code);
+void handle_interrupt(struct interrupt_frame *frame, u64 interrupt_code)
+{
 #ifdef TEST_MODE
     debug_puts("[!] Interrupt - code ");
     debug_put_hex(interrupt_code);
     debug_puts("\n");
 #endif
     dump_frame(frame);
-    __asm__ volatile ("cli; hlt");
+    __asm__ volatile("cli; hlt");
 }
 
-__attribute__((noreturn))
-void handle_interrupt_with_error_code(struct interrupt_frame *frame, u64 interrupt_code, u64 error_code);
-void handle_interrupt_with_error_code(struct interrupt_frame *frame, u64 interrupt_code, u64 error_code) {
+__attribute__((noreturn)) void
+handle_interrupt_with_error_code(struct interrupt_frame *frame,
+                                 u64 interrupt_code, u64 error_code);
+void handle_interrupt_with_error_code(struct interrupt_frame *frame,
+                                      u64 interrupt_code, u64 error_code)
+{
 
 #ifdef TEST_MODE
     debug_puts("[!] Interrupt - code ");
@@ -49,7 +54,5 @@ void handle_interrupt_with_error_code(struct interrupt_frame *frame, u64 interru
     debug_puts("\n");
 #endif
     dump_frame(frame);
-    __asm__ volatile ("cli; hlt");
+    __asm__ volatile("cli; hlt");
 }
-
-

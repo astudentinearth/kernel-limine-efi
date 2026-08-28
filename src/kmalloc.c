@@ -135,9 +135,7 @@ void *fixed_alloc(usize bs)
     page->total_allocated++;
     page->next_free = next_free;
 
-    if (next_free == NULL) {
-        *bucket = NULL; 
-    }
+    if (next_free == NULL) { *bucket = NULL; }
 
     return (void *)current_free;
 }
@@ -151,18 +149,19 @@ void *kmalloc(usize size)
     return fixed_alloc(bs);
 }
 
-void kfree(void *ptr) {
+void kfree(void *ptr)
+{
     uptr page_ptr = INFER_PAGE((uptr)ptr);
-    struct PageMeta *page = (struct PageMeta*)page_ptr;
-   
+    struct PageMeta *page = (struct PageMeta *)page_ptr;
+
     // page can be released
-    if(page->total_allocated == 1) {
+    if (page->total_allocated == 1) {
         kfree_vframe(page);
         return;
     }
 
     uptr free_list_head = page->next_free;
-    *(uptr*)ptr = free_list_head;
+    *(uptr *)ptr = free_list_head;
     page->next_free = (uptr)ptr;
     page->total_allocated--;
 }
@@ -294,8 +293,10 @@ void test_malloc()
         usize bs = block_sizes[i];
         struct PageMeta **bucket_ptr = get_page_for_bucket(bs);
         struct PageMeta *initial_frame = *bucket_ptr;
-        usize block_count =  BLOCK_COUNT(**bucket_ptr);
-        for (usize j = 0; j < block_count; j++) fixed_alloc(bs);
+        usize block_count = BLOCK_COUNT(**bucket_ptr);
+        for (usize j = 0; j < block_count; j++) {
+            fixed_alloc(bs);
+        }
         describe("fixed_alloc page rotation",
                  assert_equals_uint(BLOCK_COUNT(*initial_frame),
                                     initial_frame->total_allocated,

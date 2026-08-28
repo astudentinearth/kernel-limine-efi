@@ -3,7 +3,6 @@
 
 #define CPUID_FEAT_EDX_APIC 1 << 9
 
-char* get_cpu_model_string();
+char *get_cpu_model_string();
 
-void debug_print_cpu_model(); 
-
+void debug_print_cpu_model();

@@ -10,7 +10,8 @@ struct TestBlock {
     char z;
 };
 
-void test_memcpy() {
+void test_memcpy()
+{
     struct TestBlock b1;
     struct TestBlock b2;
 
@@ -24,13 +25,7 @@ void test_memcpy() {
 
     memcpy(&b2, &b1, sizeof(struct TestBlock));
 
-    describe(
-        "memcpy", 
-        assert(b2.x == 12, "x"), 
-        assert(b2.y == 24, "y"), 
-        assert(b2.z == 'c', "c")
-    );
-
-
+    describe("memcpy", assert(b2.x == 12, "x"), assert(b2.y == 24, "y"),
+             assert(b2.z == 'c', "c"));
 }
 #endif

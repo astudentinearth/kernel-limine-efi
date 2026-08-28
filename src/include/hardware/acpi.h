@@ -1,6 +1,6 @@
 #pragma once
-#include <stdbool.h>
 #include "stdint.h"
+#include <stdbool.h>
 
 #define REVISION_RSDP 0
 #define REVISION_XSDP 2
@@ -89,7 +89,7 @@ struct MADT_local_apic_entry {
     u8 acpi_processor_id;
     u8 apic_id;
     u32 flags;
-}__attribute__((packed));
+} __attribute__((packed));
 
 struct MADT_io_apic_entry {
     u8 entry_type;
@@ -98,5 +98,4 @@ struct MADT_io_apic_entry {
     u8 reserved;
     u32 io_apic_phys_addr;
     u32 global_system_interrupt_base;
-}__attribute__((packed));
-
+} __attribute__((packed));

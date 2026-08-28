@@ -14,7 +14,7 @@ struct InterruptDescriptor64 {
     u16 offset_31_16;
     u32 offset_63_32;
     u32 reserved_zero;
-}__attribute__((packed));
+} __attribute__((packed));
 
 struct interrupt_frame {
     uword_t ip;
@@ -23,7 +23,6 @@ struct interrupt_frame {
     uword_t sp;
     uword_t ss;
 };
-
 
 void setup_idt();
 
@@ -43,5 +42,3 @@ void setup_idt();
 #define INT_GENERAL_PROTECTION_FAULT 0X0D
 #define INT_PAGE_FAULT 0x0E
 #define INT_KEYBOARD 0x21
-
-

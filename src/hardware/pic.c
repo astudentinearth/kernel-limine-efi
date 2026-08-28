@@ -5,16 +5,14 @@
 #include "hardware/cpu.h"
 #include "hardware/msr.h"
 #include "hardware/serial.h"
-#include "string.h"
 #include "paging.h"
+#include "stdint.h"
+#include "string.h"
 #include <cpuid.h>
 #include <stddef.h>
-#include "stdint.h"
 
 uptr apic_base;
 static io_apic_t default_apic;
-
-
 
 void disable_legacy_pic(void)
 {
@@ -22,11 +20,8 @@ void disable_legacy_pic(void)
     outb(PIC2_8259_DATA, 0xff);
 }
 
-__attribute__((used))
-void lapic_eoi();
-void lapic_eoi() {
-     *(volatile u32*)(apic_base + 0xB0) = 0;
-}
+__attribute__((used)) void lapic_eoi();
+void lapic_eoi() { *(volatile u32 *)(apic_base + 0xB0) = 0; }
 
 bool check_apic()
 {
@@ -79,9 +74,7 @@ void write_ioapic_redir_entry(io_apic_t apic, u8 n,
     write_ioapic_reg(apic, IOAPICREDTBL(n) + 1, entry.upper);
 }
 
-io_apic_t *get_default_ioapic() {
-    return &default_apic;
-}
+io_apic_t *get_default_ioapic() { return &default_apic; }
 
 void setup_ioapic(io_apic_t *apic, void *phys_addr, u64 gsib)
 {
@@ -140,8 +133,7 @@ void parse_madt()
                      READ_WRITE | PAGE_CACHE_DISABLE);
             debug_info("acpi: mapped ioapic to virtual address @%p\n",
                        ioapic_virt);
-            setup_ioapic(&default_apic,
-                         (void *)(uptr)entry->io_apic_phys_addr,
+            setup_ioapic(&default_apic, (void *)(uptr)entry->io_apic_phys_addr,
                          entry->global_system_interrupt_base);
             break;
         }
@@ -173,8 +165,7 @@ void init_apic()
 
     cpu_set_apic_base(base);
 
-    volatile u32 *sivr =
-        (volatile u32 *)(apic_base + APIC_SIVR_OFFSET);
+    volatile u32 *sivr = (volatile u32 *)(apic_base + APIC_SIVR_OFFSET);
     *sivr = 0x100 | 0xFF;
     debug_success("APIC is now ready.\n");
     parse_madt();

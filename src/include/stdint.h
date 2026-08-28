@@ -21,4 +21,3 @@ typedef i32 int32_t;
 typedef i16 int16_t;
 typedef i8 int8_t;
 typedef uptr uintptr_t;
-

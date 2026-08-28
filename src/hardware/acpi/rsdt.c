@@ -48,9 +48,13 @@ void map_sdt(uptr phys_addr)
     debug_info("Mapped %s entry @%p\n", signature, virt_addr);
 }
 
-uptr get_rsdt_entry(usize n) {
-    if(get_acpi_revision() == REVISION_RSDP) return rsdt->other_headers_ptr[n];
-    else return xsdt->other_headers_ptr[n];
+uptr get_rsdt_entry(usize n)
+{
+    if (get_acpi_revision() == REVISION_RSDP) {
+        return rsdt->other_headers_ptr[n];
+    } else {
+        return xsdt->other_headers_ptr[n];
+    }
 }
 
 void memmap_rsdt_entries()
@@ -72,7 +76,7 @@ void init_rsdt()
 
     rsdt = (struct RSDT_t *)virtual_addr;
 
-    if (get_acpi_revision() == REVISION_XSDP) { xsdt = (XSDT_t*)virtual_addr; }
+    if (get_acpi_revision() == REVISION_XSDP) { xsdt = (XSDT_t *)virtual_addr; }
 
     if (!validate_rsdt(&rsdt->header)) {
         panic("RSDT/XSDT checksum failed.");

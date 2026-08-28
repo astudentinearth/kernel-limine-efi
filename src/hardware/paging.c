@@ -1,15 +1,15 @@
 
 #include "paging.h"
+#include "boot/limine.h"
 #include "boot/limine_requests.h"
 #include "debug.h"
 #include "hardware/allocator.h"
 #include "hardware/memory.h"
-#include "boot/limine.h"
+#include "stdint.h"
 #include "string.h"
 #include "test/assert.h"
 #include <stdbool.h>
 #include <stddef.h>
-#include "stdint.h"
 
 // our page tables that we'll build
 u64 *kernel_pml4;
@@ -122,7 +122,7 @@ u64 *create_pd()
 void _map_page(void *physical_address, void *virtual_address, u32 flags,
                u64 *pml4)
 {
-    asm volatile ("cli");
+    asm volatile("cli");
     u64 *pml4_entry = &pml4[PML4_IDX((u64)virtual_address)];
 
     if (!(*pml4_entry & IS_PRESENT)) {
@@ -132,14 +132,12 @@ void _map_page(void *physical_address, void *virtual_address, u32 flags,
             debug_err("pdpt @%p is null", new_pdpt);
             panic("PDPT NULL");
         }
-        u64 new_pml4_entry =
-            ((u64)get_physaddr(new_pdpt, get_active_pml4())) |
-            (IS_PRESENT | flags);
+        u64 new_pml4_entry = ((u64)get_physaddr(new_pdpt, get_active_pml4())) |
+                             (IS_PRESENT | flags);
         *pml4_entry = new_pml4_entry;
     }
 
-    u64 *pdpt =
-        (u64 *)get_virtaddr((void *)ENTRY_ADDR((*pml4_entry)));
+    u64 *pdpt = (u64 *)get_virtaddr((void *)ENTRY_ADDR((*pml4_entry)));
     u64 *pdpt_entry = &pdpt[PDPT_IDX((u64)virtual_address)];
     if (!(*pdpt_entry & IS_PRESENT)) {
         // no pdpt entry, create pd and assign it to new pdpt entry
@@ -148,9 +146,8 @@ void _map_page(void *physical_address, void *virtual_address, u32 flags,
             debug_err("pd @%p is null", new_pd);
             panic("pd NULL");
         }
-        u64 new_pdpt_entry =
-            ((u64)get_physaddr(new_pd, get_active_pml4())) |
-            (IS_PRESENT | flags);
+        u64 new_pdpt_entry = ((u64)get_physaddr(new_pd, get_active_pml4())) |
+                             (IS_PRESENT | flags);
         *pdpt_entry = new_pdpt_entry;
     }
 
@@ -163,9 +160,8 @@ void _map_page(void *physical_address, void *virtual_address, u32 flags,
             debug_err("pt @%p is null", new_pt);
             panic("pt NULL");
         }
-        u64 new_pd_entry =
-            ((u64)get_physaddr(new_pt, get_active_pml4())) |
-            (IS_PRESENT | flags);
+        u64 new_pd_entry = ((u64)get_physaddr(new_pt, get_active_pml4())) |
+                           (IS_PRESENT | flags);
         *pd_entry = new_pd_entry;
     }
 
@@ -173,7 +169,7 @@ void _map_page(void *physical_address, void *virtual_address, u32 flags,
     u64 *pt_entry = &pt[PT_IDX((u64)virtual_address)];
     // we reached the end, map the page
     *pt_entry = (u64)physical_address | (IS_PRESENT | flags);
-    asm volatile ("sti");
+    asm volatile("sti");
 }
 
 void map_page(void *physical_address, void *virtual_address, u32 flags)
@@ -207,7 +203,7 @@ void map_hhdm()
 
     for (unsigned int i = 0; i < entry_count; i++) {
         MemoryMapEntry_t current_entry = memmap_entries[i];
-        if(current_entry.type == HW_RESERVED) continue;
+        if (current_entry.type == HW_RESERVED) { continue; }
 
         u64 page_count = current_entry.length / PAGE_SIZE;
 

@@ -1,7 +1,7 @@
 
 #include "hardware/msr.h"
-#include <cpuid.h>
 #include "stdint.h"
+#include <cpuid.h>
 
 const u32 CPUID_FLAG_MSR = 1 << 5;
 
@@ -13,11 +13,7 @@ bool cpu_has_msr()
 }
 
 void cpu_get_msr(u32 msr, u32 *lo, u32 *hi)
-{
-    asm volatile("rdmsr" : "=a"(*lo), "=d"(*hi) : "c"(msr));
-}
+{ asm volatile("rdmsr" : "=a"(*lo), "=d"(*hi) : "c"(msr)); }
 
 void cpu_set_msr(u32 msr, u32 lo, u32 hi)
-{
-    asm volatile("wrmsr" : : "a"(lo), "d"(hi), "c"(msr));
-}
+{ asm volatile("wrmsr" : : "a"(lo), "d"(hi), "c"(msr)); }

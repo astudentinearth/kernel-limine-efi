@@ -16,4 +16,3 @@ typedef struct {
 void process_keyboard_event(u8 scancode);
 void queue_interrupt(kinterrupt_t interrupt);
 void kern_handle_interrupt();
-

@@ -49,9 +49,10 @@ static void setup_acpi_v1()
 }
 
 static void setup_acpi_v2()
-{ debug_info("Found XSDP (revision %d) for ACPI 2.0+\n", rsdp->revision); 
-    xsdp = (struct XSDP_t*)rsdp;
-    if(!validate_xsdp(xsdp)) panic("XSDP invalid.");
+{
+    debug_info("Found XSDP (revision %d) for ACPI 2.0+\n", rsdp->revision);
+    xsdp = (struct XSDP_t *)rsdp;
+    if (!validate_xsdp(xsdp)) { panic("XSDP invalid."); }
 
     char oemid[7];
     memset(oemid, 0, 7);
@@ -74,9 +75,10 @@ void limine_init_rsdp()
 }
 
 /** Returns the **physical** address of the RSDT. */
-uptr get_root_system_descriptor_addr() { return rsdp->revision == REVISION_RSDP ? rsdp->rsdt_address : xsdp->xsdt_address; }
-
-u64 get_acpi_revision() {
-    return rsdp->revision;
+uptr get_root_system_descriptor_addr()
+{
+    return rsdp->revision == REVISION_RSDP ? rsdp->rsdt_address
+                                           : xsdp->xsdt_address;
 }
 
+u64 get_acpi_revision() { return rsdp->revision; }

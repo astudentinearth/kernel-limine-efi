@@ -10,8 +10,8 @@
 #include "hardware/pic.h"
 #include "idt.h"
 #include "paging.h"
-#include "test/test.h"
 #include "string.h"
+#include "test/test.h"
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -26,7 +26,6 @@ static void hcf(void)
         asm("hlt");
     }
 }
-
 
 extern void enable_hardware_interrupts();
 
