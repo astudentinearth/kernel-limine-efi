@@ -38,6 +38,11 @@ struct RSDT_t {
     u32 other_headers_ptr[];
 } __attribute__((packed));
 
+typedef struct {
+    struct ACPI_SDT header;
+    uptr other_headers_ptr[];
+} __attribute__((packed)) XSDT_t;
+
 /** virtual addresses to rsdt table entries */
 struct system_tables {
     struct ACPI_SDT *facp;
@@ -51,7 +56,8 @@ bool validate_rsdp(const struct RSDP_t *rsdp);
 bool validate_xsdp(struct XSDP_t *xsdp);
 bool validate_rsdt(const struct ACPI_SDT *rsdt_header);
 void limine_init_rsdp();
-uptr get_rsdt_address();
+uptr get_root_system_descriptor_addr();
+u64 get_acpi_revision();
 void init_rsdt();
 struct system_tables *get_acpi_tables();
 
