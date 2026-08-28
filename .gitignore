@@ -6,3 +6,4 @@ obj
 .DS_Store
 .cache
 compile_commands.json
+ovmf_vars.4m.fd
