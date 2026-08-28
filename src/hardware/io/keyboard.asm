@@ -45,9 +45,16 @@ get_scancode_set:
     call wait_out_ready
     mov al, 0xF0
     out 0x60, al
+
+    call wait_in_ready
+    in al, 0x60
+    cmp al, 0xFE
+    je return
+
     call wait_out_ready
     mov al, 0
     out 0x60, al
+
     call wait_in_ready
     in al, 0x60
     cmp al, 0xFA

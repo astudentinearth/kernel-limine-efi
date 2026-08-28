@@ -14,12 +14,7 @@ struct RSDP_t {
 } __attribute__((packed));
 
 struct XSDP_t {
-    char signature[8];
-    u8 checksum;
-    char OEMID[6];
-    u8 revision;
-    u32 rsdt_address; // deprecated since version 2.0
-
+    struct RSDP_t rsdp;
     u32 length;
     u64 xsdt_address;
     u8 extended_checksum;

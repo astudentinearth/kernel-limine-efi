@@ -12,4 +12,5 @@ u64 get_hhdm_offset();
 u64 get_physical_executable_base();
 u64 get_virtual_executable_base();
 struct limine_rsdp_response* get_limine_rsdp();
+uptr limine_get_rsdp_base();
 

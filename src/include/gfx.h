@@ -1,5 +1,5 @@
 #pragma once
-#include "limine.h"
+#include "boot/limine.h"
 #include "stdint.h"
 void draw_line(int x, int y);
 void draw_frame(int x, int y, int width, int height);

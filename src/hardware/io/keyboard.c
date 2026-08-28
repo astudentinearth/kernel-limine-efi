@@ -49,6 +49,7 @@ void keyboard_interrupt(u8 scancode) {
         .type = KEYBOARD_INT,
         .payload = scancode
     };
+    debug_printf("scancode> %x\n", scancode);
     queue_interrupt(i);
     lapic_eoi();
 }
@@ -62,8 +63,8 @@ void setup_keyboard() {
 read_ioapic_redir_entry(*apic, KEYBOARD_IRQ, &readback);
 debug_info("redir low: %x high: %x\n", readback.lower, readback.upper);
     debug_info("Set keyboard up!\n");
-    u8 set_response = ps2_kbd_scancode_cmd(1);
+    u8 set_response = 0; //ps2_kbd_scancode_cmd(1);
     u8 b = ps2_kbd_scancode_cmd(0);
-    debug_info("%x %x\n", set_response,b);
+    debug_info("set response: %x get response: %x\n", set_response,b);
 }
 

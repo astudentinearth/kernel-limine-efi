@@ -4,7 +4,7 @@
 #include "debug.h"
 #include "hardware/allocator.h"
 #include "hardware/memory.h"
-#include "limine.h"
+#include "boot/limine.h"
 #include "string.h"
 #include "test/assert.h"
 #include <stdbool.h>

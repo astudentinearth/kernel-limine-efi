@@ -1,6 +1,7 @@
 
-#include "limine.h"
+#include "boot/limine.h"
 #include "boot/limine_requests.h"
+#include "debug.h"
 #include <stddef.h>
 
 __attribute__((used,
@@ -85,3 +86,9 @@ struct limine_rsdp_response* get_limine_rsdp() {
 }
 
 bool is_base_revision_supported() { return LIMINE_BASE_REVISION_SUPPORTED; }
+
+
+uptr limine_get_rsdp_base() {
+    if(rsdp_request.response == NULL) panic("Limine RSDP response is null.");
+    return rsdp_request.response->address;
+}

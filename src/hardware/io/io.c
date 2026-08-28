@@ -28,13 +28,13 @@ void kern_handle_interrupt() {
         __asm__ volatile("cli");
         kinterrupt_t i = queue[tail];
         tail = (tail + 1) % QUEUE_SIZE;
-        __asm__ volatile("sti");
         switch(i.type) {
             case KEYBOARD_INT: {
                 process_keyboard_event(i.payload);
                 break;
                                }
         }
+        __asm__ volatile("sti");
     }
 }
 
