@@ -28,6 +28,7 @@ static void hcf(void)
 }
 
 extern void enable_hardware_interrupts();
+extern u64 get_interrupt_flag();
 
 void kmain(void)
 {
@@ -36,19 +37,21 @@ void kmain(void)
     if (!is_base_revision_supported() || !limine_framebuffer_available()) {
         hcf();
     }
+  
+    // no interrupts during bootstrap
+    __asm__ volatile("cli");
 
-    // Fetch the first framebuffer.
+    // fetch the first framebuffer.
     struct limine_framebuffer *framebuffer = get_limine_framebuffer(0);
     init_memory_map();
-    debug("Hello world!");
+    debug_info("Hello world!\n");
 
-    debug("!!! Loading GDT");
+    debug_info("Loading GDT\n");
     setup_gdt();
     setup_idt();
     set_framebuffer(framebuffer);
     gfx_init();
     init_pmm();
-    debug("If you didn't triple fault here congrats");
 
 #ifdef TEST_MODE
     debug("Running in test mode");

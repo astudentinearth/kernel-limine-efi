@@ -47,8 +47,9 @@ void debug_newline() { debug_puts("\n"); }
 
 void panic(const char *message)
 {
-    debug_err("KERNEL PANIC");
+    debug_err("<=== KERNEL PANIC ===>\n");
     debug_err(message);
+    debug_newline();
     asm("cli; hlt");
 }
 

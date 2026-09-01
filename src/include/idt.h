@@ -42,3 +42,4 @@ void setup_idt();
 #define INT_GENERAL_PROTECTION_FAULT 0X0D
 #define INT_PAGE_FAULT 0x0E
 #define INT_KEYBOARD 0x21
+

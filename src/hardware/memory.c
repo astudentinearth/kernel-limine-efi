@@ -4,6 +4,7 @@
 #include "boot/limine_requests.h"
 #include "debug.h"
 #include <stddef.h>
+#include "lock.h"
 
 static u64 memmap_entry_count;
 static bool memmap_initialized = false;
@@ -66,6 +67,7 @@ void load_limine_memmap_entries()
 
 void init_memory_map()
 {
+    _no_interrupts
     load_limine_memmap_entries();
 
     MemoryMapEntry_t largest = memmap_entries[0];

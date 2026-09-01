@@ -1,6 +1,6 @@
 
 #include "hardware/io.h"
-#include "debug.h"
+#include "lock.h"
 
 #define QUEUE_SIZE 512
 static kinterrupt_t queue[QUEUE_SIZE];
@@ -10,7 +10,7 @@ kinterrupt_t noop = {.payload = NOOP, .type = NOOP};
 
 void queue_interrupt(kinterrupt_t interrupt)
 {
-    __asm__ volatile("cli");
+    _no_interrupts
     u64 next = (head + 1) % QUEUE_SIZE;
     if (next == tail) {
         __asm__ volatile("sti");
@@ -18,13 +18,12 @@ void queue_interrupt(kinterrupt_t interrupt)
     }
     queue[head] = interrupt;
     head = next;
-    __asm__ volatile("sti");
 }
 
 void kern_handle_interrupt()
 {
     while (tail != head) {
-        __asm__ volatile("cli");
+        _no_interrupts
         kinterrupt_t i = queue[tail];
         tail = (tail + 1) % QUEUE_SIZE;
         switch (i.type) {
@@ -33,6 +32,5 @@ void kern_handle_interrupt()
             break;
         }
         }
-        __asm__ volatile("sti");
     }
 }

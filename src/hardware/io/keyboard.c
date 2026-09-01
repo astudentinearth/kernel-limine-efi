@@ -47,7 +47,6 @@ void process_keyboard_event(u8 scancode)
 void keyboard_interrupt(u8 scancode)
 {
     kinterrupt_t i = {.type = KEYBOARD_INT, .payload = scancode};
-    debug_printf("scancode> %x\n", scancode);
     queue_interrupt(i);
     lapic_eoi();
 }

@@ -1,6 +1,5 @@
 
 #include "paging.h"
-#include "boot/limine.h"
 #include "boot/limine_requests.h"
 #include "debug.h"
 #include "hardware/allocator.h"
@@ -8,6 +7,7 @@
 #include "stdint.h"
 #include "string.h"
 #include "test/assert.h"
+#include "lock.h"
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -122,7 +122,7 @@ u64 *create_pd()
 void _map_page(void *physical_address, void *virtual_address, u32 flags,
                u64 *pml4)
 {
-    asm volatile("cli");
+    _no_interrupts
     u64 *pml4_entry = &pml4[PML4_IDX((u64)virtual_address)];
 
     if (!(*pml4_entry & IS_PRESENT)) {
@@ -169,7 +169,6 @@ void _map_page(void *physical_address, void *virtual_address, u32 flags,
     u64 *pt_entry = &pt[PT_IDX((u64)virtual_address)];
     // we reached the end, map the page
     *pt_entry = (u64)physical_address | (IS_PRESENT | flags);
-    asm volatile("sti");
 }
 
 void map_page(void *physical_address, void *virtual_address, u32 flags)
@@ -223,6 +222,7 @@ void map_hhdm()
 
 void init_paging()
 {
+    _no_interrupts
     if (paging_initalized) { return; }
     debug_info("Initializing paging\n");
     kernel_pml4 = get_virtaddr((void *)kalloc_frame());

@@ -2,6 +2,7 @@
 #include "gdt.h"
 #include "debug.h"
 #include "stdint.h"
+#include "lock.h"
 
 extern void set_gdt(u16 limit, u64 base);
 
@@ -14,6 +15,7 @@ static struct system_segment_descriptor ssd;
 
 void setup_gdt()
 {
+    _no_interrupts
     gdt.kernel_cs = KERNEL_CS;
     gdt.kernel_data = KERNEL_DATA;
     gdt.user_data = USER_DATA;

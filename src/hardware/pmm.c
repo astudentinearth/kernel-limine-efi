@@ -7,6 +7,7 @@
 #include "stdint.h"
 #include "string.h"
 #include <stdbool.h>
+#include "lock.h"
 
 #define USED true
 #define FREE false
@@ -123,6 +124,7 @@ static void free_frame(PhysicalRegion_t *region, pageframe_t pframe)
 
 pageframe_t kalloc_frame()
 {
+    _no_interrupts
     total_allocated_pages++;
     return alloc_frame(&active_region);
 }
@@ -131,6 +133,7 @@ void *kalloc_vframe() { return get_virtaddr((void *)kalloc_frame()); }
 
 void kfree_frame(pageframe_t pframe)
 {
+    _no_interrupts
     total_allocated_pages--;
     free_frame(&active_region, pframe);
 }
@@ -159,6 +162,7 @@ void debug_print_vm_stats()
 
 void init_pmm()
 {
+    _no_interrupts
     u64 pool_start = (u64)get_largest_usable_memory_block();
     u64 size = get_largest_usable_memory_block_size();
 
