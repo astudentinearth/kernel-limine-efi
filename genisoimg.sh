@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 rm -rf iso_root
 
 mkdir -p iso_root/boot
@@ -17,5 +18,5 @@ xorriso -as mkisofs -R -r -J -b boot/limine/limine-bios-cd.bin \
         -efi-boot-part --efi-boot-image --protective-msdos-label \
         iso_root -o image.iso
 
-./limine/limine bios-install image.iso
+"${LIMINE_CMD:-./limine/limine}" bios-install image.iso
 
