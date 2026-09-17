@@ -10,5 +10,6 @@ extern u32 get_cr4();
 void test_paging();
 void test_malloc();
 void run_tests();
+void test_vmm();
 
 #endif

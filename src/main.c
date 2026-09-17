@@ -13,6 +13,7 @@
 #include "paging.h"
 #include "string.h"
 #include "test/test.h"
+#include "vmm.h"
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -38,7 +39,7 @@ void kmain(void)
     if (!is_base_revision_supported() || !limine_framebuffer_available()) {
         hcf();
     }
-  
+
     // no interrupts during bootstrap
     __asm__ volatile("cli");
 
@@ -54,15 +55,9 @@ void kmain(void)
     set_framebuffer(framebuffer);
     gfx_init();
     init_pmm();
-
-#ifdef TEST_MODE
-    debug("Running in test mode");
-    dump_memory_info();
-    draw_char(16, 16, 'A', 0xffffffff);
-    run_tests();
-#endif
-
     init_paging();
+    init_vmm(get_hhdm_offset(), get_cpuid()->physical_address_bits);
+
     limine_init_rsdp();
     init_rsdt();
     init_apic();
@@ -70,5 +65,12 @@ void kmain(void)
     enable_hardware_interrupts();
     probe_pci();
     cpuid_debug_print_info();
+
+#ifdef TEST_MODE
+    debug("Running in test mode");
+    dump_memory_info();
+    draw_char(16, 16, 'A', 0xffffffff);
+    run_tests();
+#endif
     hcf();
 }

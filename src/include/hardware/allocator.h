@@ -4,6 +4,7 @@
 
 #define MAX_PAGE_COUNT 32768
 #define PAGE_SIZE 4096
+#define pages_for_size(bytes) bytes % PAGE_SIZE > 0 ? bytes / PAGE_SIZE + 1 : bytes / PAGE_SIZE
 typedef u64 pageframe_t;
 
 pageframe_t kalloc_frame();
