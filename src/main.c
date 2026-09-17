@@ -4,6 +4,7 @@
 #include "gfx.h"
 #include "hardware/acpi.h"
 #include "hardware/allocator.h"
+#include "hardware/cpu.h"
 #include "hardware/io.h"
 #include "hardware/memory.h"
 #include "hardware/pci.h"
@@ -49,6 +50,7 @@ void kmain(void)
     debug_info("Loading GDT\n");
     setup_gdt();
     setup_idt();
+    init_cpuid();
     set_framebuffer(framebuffer);
     gfx_init();
     init_pmm();
@@ -67,5 +69,6 @@ void kmain(void)
     setup_keyboard();
     enable_hardware_interrupts();
     probe_pci();
+    cpuid_debug_print_info();
     hcf();
 }
