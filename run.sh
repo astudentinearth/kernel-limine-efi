@@ -2,7 +2,9 @@
 qemu-system-x86_64 \
     -m 512M \
     -smp 1 \
-    -cdrom image.iso -boot d \
+    -device piix3-ide,id=ide \
+    -drive file=image.iso,format=raw,if=none,id=bootcd,readonly=on \
+    -device ide-cd,drive=bootcd,bus=ide.0,unit=0,bootindex=1 \
     -serial stdio \
     -no-reboot \
     -machine q35 -cpu qemu64 \
