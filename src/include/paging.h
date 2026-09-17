@@ -1,4 +1,5 @@
 #pragma once
+#include "hardware/allocator.h"
 #include "stdint.h"
 
 // page tree offsets
@@ -23,3 +24,4 @@ void *get_physaddr(void *virt_addr, u64 *pml4);
 u64 *get_active_pml4();
 
 void map_page(void *physical_address, void *virtual_address, u32 flags);
+pageframe_t unmap_page(void* virtual_addr);

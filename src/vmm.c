@@ -39,6 +39,8 @@ void *valloc(usize n)
     return ret;
 }
 
+usize get_vmm_start() { return vmm_start; }
+
 #ifdef TEST_MODE
 void test_vmm()
 {

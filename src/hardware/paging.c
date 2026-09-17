@@ -4,10 +4,10 @@
 #include "debug.h"
 #include "hardware/allocator.h"
 #include "hardware/memory.h"
+#include "lock.h"
 #include "stdint.h"
 #include "string.h"
 #include "test/assert.h"
-#include "lock.h"
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -22,18 +22,18 @@ static bool paging_initalized = false;
 extern char _kernel_end[];
 
 void *get_virtaddr(void *phys)
-{ return (void *)((u64)phys + get_hhdm_offset()); }
+{
+    return (void *)((u64)phys + get_hhdm_offset());
+}
 
 /** Get a pointer to the active PML4, from the CR3 register */
 u64 *get_active_pml4()
-{ return ((u64 *)(get_virtaddr((void *)(get_cr3() & ~0xFFF)))); }
-
-/**
- * Evaluate a virtual address to a physical address for given page table
- */
-void *get_physaddr(void *virtual_addr, u64 *pml4)
 {
+    return ((u64 *)(get_virtaddr((void *)(get_cr3() & ~0xFFF))));
+}
 
+u64 *get_pd(void *virtual_addr, u64 *pml4)
+{
     u64 pml4_index = PML4_IDX((u64)virtual_addr);
     u64 pml4_entry = pml4[pml4_index];
 
@@ -44,7 +44,43 @@ void *get_physaddr(void *virtual_addr, u64 *pml4)
     if (!(pdpt_entry & IS_PRESENT)) { return NULL; }
 
     u64 *pd = (u64 *)get_virtaddr((void *)(ENTRY_ADDR(pdpt_entry)));
-    u64 pd_entry = pd[PD_IDX((u64)virtual_addr)];
+    return &pd[PD_IDX((u64)virtual_addr)];
+}
+
+pageframe_t _unmap_page(void *virtual_addr, u64 *pml4)
+{
+    _no_interrupts
+    u64 *pd_entry = get_pd(virtual_addr, pml4);
+    if(pd_entry == NULL) return 0;
+    if (!(*pd_entry & IS_PRESENT)) return 0;
+
+    // 2mb page
+    if (*pd_entry & PS) {
+        pageframe_t physaddr = ENTRY_ADDR(*pd_entry);
+        *pd_entry = 0; // goodbye
+        return physaddr;
+    }
+
+    u64 *pt = (u64 *)get_virtaddr((void *)(ENTRY_ADDR(*pd_entry)));
+    u64 pt_idx = PT_IDX((u64)virtual_addr);
+    pageframe_t physaddr = ENTRY_ADDR(pt[pt_idx]);
+    pt[pt_idx] = 0; // goodbye
+    return physaddr;
+}
+
+pageframe_t unmap_page(void* virtual_addr) {
+    _no_interrupts
+    pageframe_t result = _unmap_page(virtual_addr, get_active_pml4());
+    invalidate_page(virtual_addr);
+    return result;
+}
+
+/**
+ * Evaluate a virtual address to a physical address for given page table
+ */
+void *get_physaddr(void *virtual_addr, u64 *pml4)
+{
+    u64 pd_entry = *get_pd(virtual_addr, pml4);
 
     // 2mb page
     if (pd_entry & PS) {
@@ -122,8 +158,7 @@ u64 *create_pd()
 void _map_page(void *physical_address, void *virtual_address, u32 flags,
                u64 *pml4)
 {
-    _no_interrupts
-    u64 *pml4_entry = &pml4[PML4_IDX((u64)virtual_address)];
+    _no_interrupts u64 *pml4_entry = &pml4[PML4_IDX((u64)virtual_address)];
 
     if (!(*pml4_entry & IS_PRESENT)) {
         // no pml4 entry, create pdpt and assign it to pml4 entry
@@ -222,8 +257,7 @@ void map_hhdm()
 
 void init_paging()
 {
-    _no_interrupts
-    if (paging_initalized) { return; }
+    _no_interrupts if (paging_initalized) { return; }
     debug_info("Initializing paging\n");
     kernel_pml4 = get_virtaddr((void *)kalloc_frame());
     memset(kernel_pml4, 0, PAGE_SIZE);

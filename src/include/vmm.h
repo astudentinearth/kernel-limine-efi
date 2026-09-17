@@ -11,3 +11,4 @@ void init_vmm(usize hhdm_offset, usize physical_address_bits);
 
 /** Reserve n bytes in the higher-half virtual address space. **This does not map pages, you have to handle it yourself!** */
 void *valloc(usize n);
+usize get_vmm_start();

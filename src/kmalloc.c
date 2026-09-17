@@ -1,7 +1,14 @@
 #include "debug.h"
 #include "hardware/allocator.h"
+#include "lock.h"
 #include "paging.h"
 #include "stdint.h"
+#include "vmm.h"
+
+struct LargeAllocMeta {
+    usize total_allocated_bytes;
+    usize page_count;
+};
 
 struct PageMeta {
     usize block_size;
@@ -140,18 +147,54 @@ void *fixed_alloc(usize bs)
     return (void *)current_free;
 }
 
+void *big_alloc(usize n)
+{
+    _no_interrupts usize real_size = n + sizeof(struct LargeAllocMeta);
+    void *ptr = valloc(real_size);
+    usize page_count = pages_for_size(real_size);
+    for (usize i = 0; i < page_count; i++) {
+        pageframe_t frame = kalloc_frame();
+        map_page((void *)frame, ptr + (i * PAGE_SIZE), IS_PRESENT | READ_WRITE);
+    }
+
+    struct LargeAllocMeta *meta = ptr;
+    meta->page_count = page_count;
+    meta->total_allocated_bytes = n;
+    return ptr + sizeof(struct LargeAllocMeta);
+}
+
+void big_free(void *ptr)
+{
+    _no_interrupts void *start_page = (void *)INFER_PAGE((uptr)ptr);
+    struct LargeAllocMeta *meta = start_page;
+
+    // save page count before we unmap pages
+    usize page_count = meta->page_count;
+
+    for (usize i = 0; i < page_count; i++) {
+        void *addr = start_page + i * PAGE_SIZE;
+        pageframe_t backing_frame = unmap_page(addr);
+        if (backing_frame == 0) { continue; }
+        kfree_frame(backing_frame);
+    }
+}
+
 void *kmalloc(usize size)
 {
     usize bs = round_up(size);
-    if (bs == BLOCK_TOO_BIG) {
-        return NULL; // route to multi page allocator
-    }
+    if (bs == BLOCK_TOO_BIG) { return big_alloc(size); }
     return fixed_alloc(bs);
 }
 
 void kfree(void *ptr)
 {
     uptr page_ptr = INFER_PAGE((uptr)ptr);
+
+    // not in any of the buckets, huge allocation
+    if (page_ptr >= get_vmm_start()) {
+        big_free(ptr);
+        return;
+    }
     struct PageMeta *page = (struct PageMeta *)page_ptr;
 
     // page can be released
@@ -171,7 +214,9 @@ void kfree(void *ptr)
 #include "test/assert.h"
 
 void print_free_1024_addr()
-{ debug_err("free_1024 addr: %x value: %x\n", &free_1024, free_1024); }
+{
+    debug_err("free_1024 addr: %x value: %x\n", &free_1024, free_1024);
+}
 
 void test_malloc()
 {
@@ -308,6 +353,38 @@ void test_malloc()
                  assert(initial_frame != *bucket_ptr,
                         "switched frame head to a different page"));
     }
+
+    // test a big allocation
+    u64 *buffer = kmalloc(8192);
+
+    // if we page fault anywhere here, mapping issue
+    buffer[0] = 24;
+    buffer[4] = 67;
+    buffer[8192 / sizeof(u64) - 1] = 123;
+
+    uptr mid_buffer = (uptr)&buffer[67];
+
+    struct LargeAllocMeta *big_alloc_meta =
+        (struct LargeAllocMeta *)INFER_PAGE((uptr)buffer);
+
+    describe("big_alloc a buffer",
+             assert_equals_uint(
+                 sizeof(struct LargeAllocMeta), (uptr)buffer % PAGE_SIZE,
+                 "should start right after the header in a fresh page"),
+             assert_equals_uint(3, big_alloc_meta->page_count,
+                                "it should allocate 3 4K pages for an 8K "
+                                "allocation (buffer + header)"),
+             assert_equals_uint(8192, big_alloc_meta->total_allocated_bytes,
+                                "it should save total allocated size"),
+             assert(get_physaddr(&buffer[67], get_active_pml4()) != NULL,
+                    "there actually is a physical address"));
+
+    kfree(buffer);
+
+    describe("big_free a buffer",
+             assert_equals_ptr(
+                 NULL, get_physaddr((void *)mid_buffer, get_active_pml4()),
+                 "the page is gone"));
 }
 
 #endif
