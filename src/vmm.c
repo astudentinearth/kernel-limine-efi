@@ -12,7 +12,7 @@ static bool vmm_initialized = false;
 
 void init_vmm(usize hhdm_offset, usize physical_address_bits)
 {
-    if(vmm_initialized) return;
+    if (vmm_initialized) { return; }
     usize bits = min(physical_address_bits, VMM_CAP_PHYSICAL_ADDRESS_BITS);
     vmm_start = hhdm_offset + upow(2, bits);
 
@@ -29,17 +29,20 @@ void init_vmm(usize hhdm_offset, usize physical_address_bits)
 void *valloc(usize n)
 {
     usize pages = pages_for_size(n);
-    _no_interrupts if (vmm_current >= KERNEL_RESERVED_START)
-        panic("vmm: vmm allocator reached kernel territory (topmost 2GiB).");
-    void *ret = (void *)(vmm_current);
+    _no_interrupts void *ret = (void *)(vmm_current);
     vmm_current += pages * PAGE_SIZE;
+    // guard against overflow
+    if (vmm_current >= KERNEL_RESERVED_START || vmm_current < (uptr)ret) {
+        panic("vmm: out of virtual address space in higher half");
+    }
+
     return ret;
 }
 
 #ifdef TEST_MODE
 void test_vmm()
 {
-    if(!vmm_initialized) panic("cannot test vmm: not initialized.");
+    if (!vmm_initialized) { panic("cannot test vmm: not initialized."); }
     uptr initial = vmm_current;
     valloc(4095);
     uptr test_roundup = vmm_current;
@@ -48,7 +51,7 @@ void test_vmm()
     uptr test_multi_page_start = (uptr)valloc(4 * PAGE_SIZE);
     uptr test_multi_page_end = vmm_current;
     describe("valloc tests", assert_equals_uint(0, vmm_start % PAGE_SIZE,
-                                             "vmm start is page aligned")),
+                                                "vmm start is page aligned")),
         assert_equals_uint(
             0, test_roundup % PAGE_SIZE,
             "vmm is still page aligned after 4095 byte allocation"),
