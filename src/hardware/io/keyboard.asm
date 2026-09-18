@@ -18,7 +18,6 @@ wait_in_ready:
     ret
 
 ps2_kbd_scancode_cmd:
-    cli
     cmp rdi, 0
     je get_scancode_set
     jne set_scancode_set
@@ -38,7 +37,6 @@ set_scancode_set:
     out 0x60, al ; sub command
     call wait_in_ready
     in al, 0x60
-    sti
     ret
 
 get_scancode_set:
@@ -59,16 +57,13 @@ get_scancode_set:
     in al, 0x60
     cmp al, 0xFA
     je return_scancode_set
-    sti
     ret ; return resend byte
 
 return:
-    sti
     ret
 
 return_scancode_set:
     call wait_in_ready
     in al, 0x60 ; read scancode byte
-    sti
     ret 
 

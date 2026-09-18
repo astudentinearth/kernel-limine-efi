@@ -29,9 +29,9 @@ void idt_set_descriptor(u8 vector, void *isr, u8 flags)
 void setup_idt()
 {
 #ifdef TEST_MODE
-    debug("Setting up IDT");
+    debug_info("Setting up IDT");
 #endif
-    u16 limit = sizeof(struct InterruptDescriptor64) * IDT_MAX_DESCRIPTORS;
+    u16 limit = sizeof(struct InterruptDescriptor64) * IDT_MAX_DESCRIPTORS - 1;
     u64 base = (u64)&idt[0];
 
     for (u16 vector = 0; vector < IDT_MAX_DESCRIPTORS; vector++) {
@@ -41,6 +41,6 @@ void setup_idt()
 
     load_idt(limit, base);
 #ifdef TEST_MODE
-    debug("IDT set");
+    debug_info("IDT set");
 #endif
 }

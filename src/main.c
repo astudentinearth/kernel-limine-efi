@@ -102,7 +102,6 @@ void kmain(void)
     gl_draw_rect(fb, GL_COLOR_WHITE, &bar);
     int i = 0;
     {
-        _no_interrupts
     for(u8 ch = '0'; ch < '0' + 3; ch++){
         gl_draw_char(fb, GL_COLOR_BLACK, 32 + (i*8), 4, ch);
         i++;

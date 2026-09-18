@@ -20,22 +20,78 @@ disable_hardware_interrupts:
     cli
     ret
 
+%macro save_registers 0
+push rax
+push rbx
+push rcx
+push rdx
+push rbp
+push rsi
+push rdi
+push r8
+push r9
+push r10
+push r11
+push r12
+push r13
+push r14
+push r15
+%endmacro
+
+%macro restore_registers 0
+pop r15
+pop r14
+pop r13
+pop r12
+pop r11
+pop r10
+pop r9
+pop r8
+pop rdi
+pop rsi
+pop rbp
+pop rdx
+pop rcx
+pop rbx
+pop rax
+%endmacro
+
 
 %macro isr_err_stub 1
 isr_stub_%+%1:
-    pop rdx
-    mov rdi, rsp
-    mov rsi, %1
+    save_registers
+    mov rbp, rsp
+
+    lea rdi, [rbp + 128] ; skip saved registers + error code
+
+    mov esi, %1
+    mov rdx, [rbp + 120] ; grab error code
+    and rsp, -16
+
+    cld
     call handle_interrupt_with_error_code
-    pop rdi
+
+    mov rsp, rbp
+    restore_registers
+
+    add rsp, 8
     iretq
 %endmacro
 
 %macro isr_no_err_stub 1
 isr_stub_%+%1:
-    mov rdi, rsp
-    mov rsi, %1
+    
+    save_registers
+    mov rbp, rsp
+    lea rdi, [rbp + 120] ; skip saved registers
+    mov esi, %1
+    and rsp, -16
+
+    cld
     call handle_interrupt
+
+    mov rsp, rbp
+    restore_registers
     iretq
 %endmacro
 
@@ -74,11 +130,18 @@ isr_no_err_stub 31
 isr_no_err_stub 32
 
 isr_stub_33:
-    push rax
+    save_registers
+
+    mov rbp, rsp
+    and rsp, -16
+    cld
+
     in al, 0x60
-    mov rdi, rax
+    movzx edi, al
     call keyboard_interrupt
-    pop rax
+    mov rsp, rbp
+    
+    restore_registers
     iretq
 
 %assign i 34
@@ -100,6 +163,5 @@ load_idt:
     mov [idtr], di
     mov [idtr + 2], rsi
     lidt [idtr]
-    sti
     ret
 

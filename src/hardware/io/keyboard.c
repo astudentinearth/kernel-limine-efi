@@ -4,6 +4,7 @@
 #include "hardware/io.h"
 #include "hardware/pic.h"
 #include "idt.h"
+#include "lock.h"
 
 static struct io_apic_redirection_entry keyboard_redir_entry = {
     .vector = INT_KEYBOARD,
@@ -53,6 +54,7 @@ void keyboard_interrupt(u8 scancode)
 
 void setup_keyboard()
 {
+    _no_interrupts
     debug_info("Setting up keyboard\n");
     io_apic_t *apic = get_default_ioapic();
     io_apic_redirection_entry_t *entry =

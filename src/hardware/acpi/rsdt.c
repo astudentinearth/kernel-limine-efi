@@ -84,7 +84,7 @@ void init_rsdt()
     }
 
     char oemid[7];
-    char oem_table_id[8];
+    char oem_table_id[9];
     memset(oemid, 0, 7);
     memset(oem_table_id, 0, 9);
     memcpy(oemid, rsdt->header.oem_id, 6);

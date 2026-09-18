@@ -35,7 +35,9 @@ void handle_interrupt(struct interrupt_frame *frame, u64 interrupt_code)
     debug_puts("\n");
 #endif
     dump_frame(frame);
-    __asm__ volatile("cli; hlt");
+    for (;;) {
+        __asm__ volatile("cli; hlt" ::: "memory");
+    }
 }
 
 __attribute__((noreturn)) void
@@ -54,5 +56,7 @@ void handle_interrupt_with_error_code(struct interrupt_frame *frame,
     debug_puts("\n");
 #endif
     dump_frame(frame);
-    __asm__ volatile("cli; hlt");
+    for (;;) {
+        __asm__ volatile("cli; hlt" ::: "memory");
+    }
 }

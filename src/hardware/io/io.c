@@ -13,7 +13,6 @@ void queue_interrupt(kinterrupt_t interrupt)
     _no_interrupts
     u64 next = (head + 1) % QUEUE_SIZE;
     if (next == tail) {
-        __asm__ volatile("sti");
         return;
     }
     queue[head] = interrupt;
