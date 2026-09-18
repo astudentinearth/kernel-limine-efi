@@ -2,7 +2,13 @@
 #include "hardware/pci.h"
 #include "debug.h"
 #include "hardware/io.h"
+#include "libk.h"
 #include "stdint.h"
+#include <stddef.h>
+
+DEFINE_LINKED_LIST(PCIDevice);
+
+listnode_PCIDevice *devices = NULL;
 
 char *pci_classes[0x11] = {
     "Unclassified",
@@ -54,7 +60,9 @@ u32 pci_read_base_address(u8 bus, u8 slot, u8 func, u8 offset)
 }
 
 u16 pci_get_vendor(u8 bus, u8 slot, u8 function)
-{ return pci_config_read_word(bus, slot, function, PCI_VENDOR_ID_OFFSET); }
+{
+    return pci_config_read_word(bus, slot, function, PCI_VENDOR_ID_OFFSET);
+}
 
 u8 pci_get_header_type(u8 bus, u8 slot, u8 function)
 {
@@ -64,7 +72,9 @@ u8 pci_get_header_type(u8 bus, u8 slot, u8 function)
 
 /** low 8 bits is subclass, high 6 bits is class */
 u16 pci_get_class_info(u8 bus, u8 slot, u8 function)
-{ return pci_config_read_word(bus, slot, function, PCI_SUBCLASS_OFFSET); }
+{
+    return pci_config_read_word(bus, slot, function, PCI_SUBCLASS_OFFSET);
+}
 
 void dump_bars(u8 bus, u8 slot, u8 function)
 {
@@ -78,6 +88,28 @@ void dump_bars(u8 bus, u8 slot, u8 function)
                bar1, bar2, bar3, bar4, bar5);
 }
 
+void pci_init_device(PCIDevice *device, u8 bus, u8 slot, u8 function)
+{
+    u16 class_info = pci_get_class_info(bus, slot, function);
+    PCIDevice _device = {
+        .vendor = pci_get_vendor(bus, slot, function),
+        .bus = bus,
+        .slot = slot,
+        .function = function,
+        .bar0 = pci_read_base_address(bus, slot, function, PCI_BAR0_OFFSET),
+        .bar1 = pci_read_base_address(bus, slot, function, PCI_BAR1_OFFSET),
+        .bar2 = pci_read_base_address(bus, slot, function, PCI_BAR2_OFFSET),
+        .bar3 = pci_read_base_address(bus, slot, function, PCI_BAR3_OFFSET),
+        .bar4 = pci_read_base_address(bus, slot, function, PCI_BAR4_OFFSET),
+        .bar5 = pci_read_base_address(bus, slot, function, PCI_BAR5_OFFSET),
+        .class = class_info >> 8,
+        .subclass = class_info,
+        .prog_if =
+            pci_config_read_word(bus, slot, function, PCI_REV_ID_OFFSET) >> 8};
+
+    *device = _device;
+}
+
 void check_device(u8 bus, u8 slot)
 {
     u8 function = 0;
@@ -89,16 +121,22 @@ void check_device(u8 bus, u8 slot)
                vendor, get_pci_class_name(class_info >> 8), class_info >> 8,
                class_info & 0xFF);
     dump_bars(bus, slot, function);
-    if ((header_type & 0x80) == 0) { return; }
+    if ((header_type & 0x80) == 0) {
+        PCIDevice device = {};
+        pci_init_device(&device, bus, slot, function);
+        push_PCIDevice(&devices, device);
+        return;
+    }
 
     for (function = 0; function < 8; function++) {
         vendor = pci_get_vendor(bus, slot, function);
         if (vendor == PCI_VENDOR_NONEXISTENT_DEVICE) { continue; }
+
         class_info = pci_get_class_info(bus, slot, function);
-        debug_info("pci: found device with vendor %x, %s(%x), subclass %x \n",
-                   vendor, get_pci_class_name(class_info >> 8), class_info >> 8,
-                   class_info & 0xFF);
-        dump_bars(bus, slot, function);
+
+        PCIDevice device = {};
+        pci_init_device(&device, bus, slot, function);
+        push_PCIDevice(&devices, device);
     }
 }
 
@@ -112,4 +150,25 @@ void probe_pci()
             check_device(bus, device);
         }
     }
+}
+
+void pci_debug_print_devices()
+{
+    if (devices == NULL) { return; }
+    listnode_PCIDevice *node = devices;
+    debug_info("=== PCI Devices ===\n");
+    debug_info("[bus:slot:fn] vendor | type(class:subclass:prog_if) | bar0 | "
+               "bar1 | bar2 | bar3 | bar4 | bar5\n");
+    while (node != NULL) {
+        PCIDevice *device = &node->node;
+        debug_info("[%d:%d:%d] %x | %s(%x:%x:%x) | %p | %p | %p | %p | %p\n",
+                   device->bus, device->slot, device->function, device->vendor,
+                   get_pci_class_name(device->class), device->class,
+                   device->subclass, device->prog_if, device->bar0,
+                   device->bar1, device->bar2, device->bar3, device->bar4,
+                   device->bar5);
+
+        node = node->next;
+    }
+    debug_info("===================\n");
 }

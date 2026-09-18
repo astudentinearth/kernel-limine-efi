@@ -65,6 +65,8 @@ void kmain(void)
     enable_hardware_interrupts();
     probe_pci();
     cpuid_debug_print_info();
+    pci_debug_print_devices();
+    
 
 #ifdef TEST_MODE
     debug("Running in test mode");
