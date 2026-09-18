@@ -1,4 +1,6 @@
 #pragma once
+#include "hardware/display.h"
+#include "stdint.h"
 #define FG_BLACK "\x1b[30m"
 #define FG_RED "\x1b[31m"
 #define FG_GREEN "\x1b[32m"
@@ -20,3 +22,20 @@
 #define BG_CYAN "\x1b[46m"
 #define BG_WHITE "\x1b[47m"
 #define BG_DEFAULT "\x1b[49m"
+
+#define TTY_CHAR_WIDTH 8
+#define TTY_CHAR_HEIGHT 16
+
+typedef struct __Terminal_t {
+    usize width;
+    usize height;
+    usize cursor_pos;
+    usize total_chars;
+    u8 *chars;
+} Terminal_t;
+
+u64 term_init(Terminal_t *term, usize width_px, usize height_px);
+void term_write(Terminal_t *term, u8 ch);
+
+void term_render(Terminal_t *term, framebuffer_t *fb, u32 fg, usize fb_x, usize fb_y);
+

@@ -14,6 +14,7 @@
 #include "lock.h"
 #include "paging.h"
 #include "string.h"
+#include "term.h"
 #include "test/test.h"
 #include "vmm.h"
 #include <stdbool.h>
@@ -75,38 +76,36 @@ void kmain(void)
     display_acquire(&fb, 0);
     gl_clear(fb, GL_COLOR_GRAY);
     Line_t line = {
-        .x = 0,
-        .y = 24,
-        .length = fb->width,
-        .dir = DIRECTION_RIGHT
-    };
+        .x = 0, .y = 24, .length = fb->width, .dir = DIRECTION_RIGHT};
     gl_draw_line(fb, GL_COLOR_BLACK, &line);
-    Rect_t frame = {
-        .x = 16,
-        .y = 32,
-        .w = fb->width - 32,
-        .h = fb->height - 48,
-        .fill = true
-    };
-    gl_draw_rect(fb, GL_COLOR_WHITE, &frame);
-    frame.fill = false;
-    gl_draw_rect(fb, GL_COLOR_BLACK, &frame);
-    Rect_t bar = {
-        .x=0,
-        .y=0,
-        .w= fb->width,
-        .h = 24,
-        .fill = true
-    };
+    Rect_t term_window = {.x = 16,
+                    .y = 32,
+                    .w = fb->width - 32,
+                    .h = fb->height - 48,
+                    .fill = true};
+    gl_draw_rect(fb, GL_COLOR_WHITE, &term_window);
+    term_window.fill = false;
+    gl_draw_rect(fb, GL_COLOR_BLACK, &term_window);
+    Rect_t bar = {.x = 0, .y = 0, .w = fb->width, .h = 24, .fill = true};
 
     gl_draw_rect(fb, GL_COLOR_WHITE, &bar);
     int i = 0;
-    {
-    for(u8 ch = '0'; ch < '0' + 3; ch++){
-        gl_draw_char(fb, GL_COLOR_BLACK, 32 + (i*8), 4, ch);
+    for (u8 ch = '0'; ch < '0' + 3; ch++) {
+        gl_draw_char(fb, GL_COLOR_BLACK, 32 + (i * 8), 4, ch);
         i++;
     }
+
+    Terminal_t *term = malloc(sizeof(Terminal_t));
+    term_init(term, term_window.w, term_window.h);
+    const char* message = "Lorem ipsum dolor sit amet. \nI don't use Arch anymore BTW!";
+    u8 *_cur = message;
+
+    while(*_cur != 0) {
+        term_write(term, *_cur++);
     }
+
+    term_render(term, fb, GL_COLOR_BLACK, term_window.x, term_window.y);
+
     display_commit(0);
 
 #ifdef TEST_MODE
