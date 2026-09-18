@@ -72,11 +72,40 @@ void kmain(void)
 
     framebuffer_t *fb = NULL;
     display_acquire(&fb, 0);
-    for(int x = 0; x < fb->width; x++){
-        for(int y = 0; y < fb->height; y++) {
-            fb->pixels[y * fb->width + x] = 0x00000000 | (((x * y / 255)) & 0x000000FF);
-        }
-    }
+    gl_clear(fb, GL_COLOR_GRAY);
+    Line_t line = {
+        .x = 0,
+        .y = 24,
+        .length = fb->width,
+        .dir = DIRECTION_RIGHT
+    };
+    gl_draw_line(fb, GL_COLOR_BLACK, &line);
+    Rect_t frame = {
+        .x = 16,
+        .y = 32,
+        .w = fb->width - 32,
+        .h = fb->height - 48,
+        .fill = true
+    };
+    gl_draw_rect(fb, GL_COLOR_WHITE, &frame);
+    frame.fill = false;
+    gl_draw_rect(fb, GL_COLOR_BLACK, &frame);
+    Rect_t bar = {
+        .x=0,
+        .y=0,
+        .w= fb->width,
+        .h = 24,
+        .fill = true
+    };
+    gl_draw_rect(fb, GL_COLOR_WHITE, &bar);
+    gl_draw_char(fb, GL_COLOR_BLACK, 8, 4, 'A');
+    gl_draw_char(fb, GL_COLOR_BLACK, 16, 4, 'r');
+    gl_draw_char(fb, GL_COLOR_BLACK, 24, 4, 'c');
+    gl_draw_char(fb, GL_COLOR_BLACK, 32, 4, 'h');
+    gl_draw_char(fb, GL_COLOR_BLACK, 40, 4, ' ');
+    gl_draw_char(fb, GL_COLOR_BLACK, 48, 4, 'b');
+    gl_draw_char(fb, GL_COLOR_BLACK, 56, 4, 't');
+    gl_draw_char(fb, GL_COLOR_BLACK, 64, 4, 'w');
     display_commit(0);
 
 #ifdef TEST_MODE
