@@ -11,6 +11,7 @@
 #include "hardware/pci.h"
 #include "hardware/pic.h"
 #include "idt.h"
+#include "lock.h"
 #include "paging.h"
 #include "string.h"
 #include "test/test.h"
@@ -63,8 +64,8 @@ void kmain(void)
     init_rsdt();
     init_apic();
     setup_keyboard();
-    enable_hardware_interrupts();
     probe_pci();
+    debug_info("printing cpuid\n");
     cpuid_debug_print_info();
     pci_debug_print_devices();
     display_t display = limine_get_display(0);
@@ -97,15 +98,16 @@ void kmain(void)
         .h = 24,
         .fill = true
     };
+
     gl_draw_rect(fb, GL_COLOR_WHITE, &bar);
-    gl_draw_char(fb, GL_COLOR_BLACK, 8, 4, 'A');
-    gl_draw_char(fb, GL_COLOR_BLACK, 16, 4, 'r');
-    gl_draw_char(fb, GL_COLOR_BLACK, 24, 4, 'c');
-    gl_draw_char(fb, GL_COLOR_BLACK, 32, 4, 'h');
-    gl_draw_char(fb, GL_COLOR_BLACK, 40, 4, ' ');
-    gl_draw_char(fb, GL_COLOR_BLACK, 48, 4, 'b');
-    gl_draw_char(fb, GL_COLOR_BLACK, 56, 4, 't');
-    gl_draw_char(fb, GL_COLOR_BLACK, 64, 4, 'w');
+    int i = 0;
+    {
+        _no_interrupts
+    for(u8 ch = '0'; ch < '0' + 3; ch++){
+        gl_draw_char(fb, GL_COLOR_BLACK, 32 + (i*8), 4, ch);
+        i++;
+    }
+    }
     display_commit(0);
 
 #ifdef TEST_MODE
@@ -113,5 +115,6 @@ void kmain(void)
     dump_memory_info();
     run_tests();
 #endif
+    enable_hardware_interrupts();
     hcf();
 }
