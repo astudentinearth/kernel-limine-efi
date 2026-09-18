@@ -179,14 +179,14 @@ void big_free(void *ptr)
     }
 }
 
-void *kmalloc(usize size)
+void *malloc(usize size)
 {
     usize bs = round_up(size);
     if (bs == BLOCK_TOO_BIG) { return big_alloc(size); }
     return fixed_alloc(bs);
 }
 
-void kfree(void *ptr)
+void free(void *ptr)
 {
     uptr page_ptr = INFER_PAGE((uptr)ptr);
 
@@ -355,7 +355,7 @@ void test_malloc()
     }
 
     // test a big allocation
-    u64 *buffer = kmalloc(8192);
+    u64 *buffer = malloc(8192);
 
     // if we page fault anywhere here, mapping issue
     buffer[0] = 24;
@@ -379,7 +379,7 @@ void test_malloc()
              assert(get_physaddr(&buffer[67], get_active_pml4()) != NULL,
                     "there actually is a physical address"));
 
-    kfree(buffer);
+    free(buffer);
 
     describe("big_free a buffer",
              assert_equals_ptr(
