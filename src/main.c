@@ -5,6 +5,7 @@
 #include "hardware/acpi.h"
 #include "hardware/allocator.h"
 #include "hardware/cpu.h"
+#include "hardware/display.h"
 #include "hardware/io.h"
 #include "hardware/memory.h"
 #include "hardware/pci.h"
@@ -66,12 +67,21 @@ void kmain(void)
     probe_pci();
     cpuid_debug_print_info();
     pci_debug_print_devices();
-    
+    display_t display = limine_get_display(0);
+    display_init(display);
+
+    framebuffer_t *fb = NULL;
+    display_acquire(&fb, 0);
+    for(int x = 0; x < fb->width; x++){
+        for(int y = 0; y < fb->height; y++) {
+            fb->pixels[y * fb->width + x] = 0x00000000 | (((x * y / 255)) & 0x000000FF);
+        }
+    }
+    display_commit(0);
 
 #ifdef TEST_MODE
     debug("Running in test mode");
     dump_memory_info();
-    draw_char(16, 16, 'A', 0xffffffff);
     run_tests();
 #endif
     hcf();

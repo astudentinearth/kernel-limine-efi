@@ -47,6 +47,19 @@ bool limine_framebuffer_available()
 struct limine_framebuffer *get_limine_framebuffer(int i)
 { return framebuffer_request.response->framebuffers[i]; }
 
+display_t limine_get_display(usize n) {
+    struct limine_framebuffer *fb = get_limine_framebuffer(n);
+    display_t display = {
+        .fb_address = fb->address,
+        .width = fb->width,
+        .height = fb->height,
+        .pitch = fb->pitch,
+        .bpp = fb->bpp
+    };
+
+    return display;
+}
+
 u64 get_framebuffer_count()
 { return framebuffer_request.response->framebuffer_count; }
 

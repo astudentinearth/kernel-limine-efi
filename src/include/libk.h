@@ -1,7 +1,6 @@
 #pragma once
 
 #include "hardware/allocator.h"
-#include "string.h"
 #include <stddef.h>
 
 #define RESULT_BAD_ALLOC 1

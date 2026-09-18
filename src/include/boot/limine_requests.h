@@ -1,9 +1,14 @@
 #pragma once
+#include "hardware/display.h"
 #include "limine.h"
 #include "stdint.h"
 #include <stdbool.h>
 
+/** @deprecated */
 struct limine_framebuffer *get_limine_framebuffer(int i);
+
+display_t limine_get_display(usize n);
+
 struct limine_memmap_response *get_limine_memmap();
 u64 get_framebuffer_count();
 bool is_base_revision_supported();
