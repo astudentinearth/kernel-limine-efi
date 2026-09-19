@@ -61,23 +61,25 @@ void kmain(void)
     init_paging();
     init_vmm(get_hhdm_offset(), get_cpuid()->physical_address_bits);
 
-    limine_init_rsdp();
-    init_rsdt();
-    init_apic();
-    setup_keyboard();
-    probe_pci();
-    debug_info("printing cpuid\n");
-    cpuid_debug_print_info();
-    pci_debug_print_devices();
-    display_t display = limine_get_display(0);
+        display_t display = limine_get_display(0);
     display_init(display);
-    kern_init_tty();
-    
+
 #ifdef TEST_MODE
     debug("Running in test mode");
     dump_memory_info();
     run_tests();
 #endif
+
+    kern_init_tty();
+    limine_init_rsdp();
+    init_rsdt();
+    init_apic();
+    setup_keyboard();
+    probe_pci();
+    cpuid_debug_print_info();
+    pci_debug_print_devices();
+
+
     enable_hardware_interrupts();
     hcf();
 }

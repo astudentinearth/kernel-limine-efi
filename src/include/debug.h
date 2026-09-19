@@ -2,6 +2,12 @@
 #include "ascii.h"
 #include "math.h"
 
+typedef void (*ttyout_fn)(u8);
+typedef void (*ttyflush_fn)();
+
+
+void debug_setup_tty_out(ttyflush_fn flush, ttyout_fn out);
+
 /**
  * Pushes a debug message into COM1 port. Ends it with a newline.
  */

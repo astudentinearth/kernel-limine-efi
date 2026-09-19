@@ -10,7 +10,7 @@
 
 u64 term_init(Terminal_t *term, usize width_px, usize height_px)
 {
-    if(width_px < TTY_CHAR_WIDTH || width_px > TTY_CHAR_HEIGHT) return EINVAL;
+    if(width_px < TTY_CHAR_WIDTH || height_px < TTY_CHAR_HEIGHT) return EINVAL;
     usize width = width_px / TTY_CHAR_WIDTH;
     usize height = height_px / TTY_CHAR_HEIGHT;
     usize total_chars = width * height;

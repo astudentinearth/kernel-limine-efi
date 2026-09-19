@@ -17,6 +17,11 @@ kinterrupt_t noop = {.payload = NOOP, .type = NOOP};
 framebuffer_t *fb = NULL;
 Terminal_t *term = NULL;
 
+static u32 _my_bg1 = 0xFF16161D;
+static u32 _my_bg2 = 0xFF1F1F28;
+static u32 _my_border = 0xFF2A2A37;
+static u32 _my_fg = 0xFFDCD7BA;
+
 void queue_interrupt(kinterrupt_t interrupt)
 {
     _no_interrupts u64 next = (head + 1) % QUEUE_SIZE;
@@ -27,10 +32,7 @@ void queue_interrupt(kinterrupt_t interrupt)
 
 void kern_render_tty()
 {
-    u32 _my_bg1 = 0xFF16161D;
-    u32 _my_bg2 = 0xFF1F1F28;
-    u32 _my_border = 0xFF2A2A37;
-    u32 _my_fg = 0xFFDCD7BA;
+
     gl_clear(fb, _my_bg1);
     Line_t line = {
         .x = 0, .y = 24, .length = fb->width, .dir = DIRECTION_RIGHT};
@@ -49,18 +51,22 @@ void kern_render_tty()
     display_commit(TTY_DISPLAY);
 }
 
+static void _ttyout(u8 ch) { term_write(term, ch); }
+
 void kern_init_tty()
 {
-    u64 error;
+    u64 error = 0;
     if ((error = display_acquire(&fb, TTY_DISPLAY))) {
         debug_err("Failed to get display %d (Error %X)", TTY_DISPLAY, error);
-        panic(__FILE__  ": Failed to acquire display");
+        panic(__FILE__ ": Failed to acquire display");
     };
     term = malloc(sizeof(Terminal_t));
-    if((error =term_init(term, fb->width - 64, fb->height - 88))) {
-        debug_err("Failed to initialize terminal (Error %X)", TTY_DISPLAY, error);
+    if ((error = term_init(term, fb->width - 64, fb->height - 88)) != RESULT_SUCCESS) {
+        debug_err("Failed to initialize terminal (Error %X)", TTY_DISPLAY,
+                  error);
         panic(__FILE__ ": Failed to initialize terminal.");
     }
+    debug_setup_tty_out(&kern_render_tty, &_ttyout);
     kern_render_tty();
 }
 
@@ -71,8 +77,8 @@ void kern_handle_interrupt()
         tail = (tail + 1) % QUEUE_SIZE;
         switch (i.type) {
         case KEYBOARD_INT: {
-            char ch =  process_keyboard_event(i.payload);
-            if(ch) term_write(term, ch);
+            char ch = process_keyboard_event(i.payload);
+            if (ch) { term_write(term, ch); }
             break;
         }
         }

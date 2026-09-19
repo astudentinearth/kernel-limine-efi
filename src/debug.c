@@ -5,16 +5,34 @@
 #include "term.h"
 #include <stdarg.h>
 
+static ttyout_fn ttyout = NULL;
+static ttyflush_fn ttyflush = NULL;
+
+#define flush() if (ttyflush != NULL) ttyflush()
+
+void debug_setup_tty_out(ttyflush_fn flush, ttyout_fn out)
+{
+    ttyout = out;
+    ttyflush = flush;
+}
+
+static inline void _out(u8 ch)
+{
+    outb(COM1, ch);
+    if (ttyout != NULL) { ttyout(ch); }
+}
+
 void debug(const char *msg)
 {
     debug_puts(msg);
-    outb(COM1, '\n');
+    _out('\n');
+    flush();
 }
 
 void debug_puts(const char *msg)
 {
     for (const char *c = msg; *c != 0; c++) {
-        outb(COM1, *c);
+        _out(*c);
     }
 }
 
@@ -50,6 +68,7 @@ void panic(const char *message)
     debug_err("<=== KERNEL PANIC ===>\n");
     debug_err(message);
     debug_newline();
+    flush();
     asm("cli; hlt");
 }
 
@@ -77,7 +96,7 @@ void debug_printf_out(const char *msg, va_list args)
                 continue;
 
             case 'c':
-                outb(COM1, va_arg(args, int));
+                _out(va_arg(args, int));
                 continue;
 
             case 's':
@@ -86,11 +105,11 @@ void debug_printf_out(const char *msg, va_list args)
 
             default:
             case '%': // handle the %% case
-                outb(COM1, '%');
+                _out('%');
                 continue;
             }
         }
-        outb(COM1, ch);
+        _out(ch);
     }
 }
 
@@ -105,6 +124,7 @@ void debug_printf(const char *msg, ...)
     va_start(args, msg);
     debug_printf_out(msg, args);
     va_end(args);
+    flush();
 }
 
 void debug_info(const char *msg, ...)
@@ -115,6 +135,7 @@ void debug_info(const char *msg, ...)
     debug_printf_out(msg, args);
     debug_puts(FG_DEFAULT);
     va_end(args);
+    flush();
 }
 
 void debug_err(const char *msg, ...)
@@ -125,6 +146,7 @@ void debug_err(const char *msg, ...)
     debug_printf_out(msg, args);
     debug_puts(FG_DEFAULT);
     va_end(args);
+    flush();
 }
 
 void debug_success(const char *msg, ...)
@@ -135,4 +157,5 @@ void debug_success(const char *msg, ...)
     debug_printf_out(msg, args);
     debug_puts(FG_DEFAULT);
     va_end(args);
+    flush();
 }
