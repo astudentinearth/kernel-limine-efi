@@ -11,10 +11,8 @@
 #include "hardware/pci.h"
 #include "hardware/pic.h"
 #include "idt.h"
-#include "lock.h"
 #include "paging.h"
 #include "string.h"
-#include "term.h"
 #include "test/test.h"
 #include "vmm.h"
 #include <stdbool.h>
@@ -46,8 +44,6 @@ void kmain(void)
     // no interrupts during bootstrap
     __asm__ volatile("cli");
 
-    // fetch the first framebuffer.
-    struct limine_framebuffer *framebuffer = get_limine_framebuffer(0);
     init_memory_map();
     debug_info("Hello world!\n");
 
@@ -55,7 +51,6 @@ void kmain(void)
     setup_gdt();
     setup_idt();
     init_cpuid();
-    set_framebuffer(framebuffer);
     gfx_init();
     init_pmm();
     init_paging();

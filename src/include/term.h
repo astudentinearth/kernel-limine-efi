@@ -1,4 +1,5 @@
 #pragma once
+#include "gfx.h"
 #include "hardware/display.h"
 #include "stdint.h"
 #define FG_BLACK "\x1b[30m"
@@ -30,11 +31,13 @@ typedef struct __Terminal_t {
     usize width;
     usize height;
     usize cursor_pos;
+    Rect_t last_rendered_cursor_rect;
     usize total_chars;
+    u32 bg_color;
     u8 *chars;
 } Terminal_t;
 
-u64 term_init(Terminal_t *term, usize width_px, usize height_px);
+u64 term_init(Terminal_t *term, usize width_px, usize height_px, u32 bg_color);
 void term_write(Terminal_t *term, u8 ch);
 
 void term_render(Terminal_t *term, framebuffer_t *fb, u32 fg, usize fb_x, usize fb_y);

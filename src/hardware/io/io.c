@@ -32,7 +32,25 @@ void queue_interrupt(kinterrupt_t interrupt)
 
 void kern_render_tty()
 {
+    term_render(term, fb, _my_fg, 32, 56);
+}
 
+static void _ttyout(u8 ch) { term_write(term, ch); }
+
+void kern_init_tty()
+{
+    u64 error = 0;
+    if ((error = display_acquire(&fb, TTY_DISPLAY))) {
+        debug_err("Failed to get display %d (Error %X)", TTY_DISPLAY, error);
+        panic(__FILE__ ": Failed to acquire display");
+    };
+    term = malloc(sizeof(Terminal_t));
+    if ((error = term_init(term, fb->width - 64, fb->height - 88, _my_bg2)) !=
+        RESULT_SUCCESS) {
+        debug_err("Failed to initialize terminal (Error %X)", TTY_DISPLAY,
+                  error);
+        panic(__FILE__ ": Failed to initialize terminal.");
+    }
     gl_clear(fb, _my_bg1);
     Line_t line = {
         .x = 0, .y = 24, .length = fb->width, .dir = DIRECTION_RIGHT};
@@ -47,27 +65,9 @@ void kern_render_tty()
     gl_draw_rect(fb, _my_border, &term_window);
     Rect_t bar = {.x = 0, .y = 0, .w = fb->width, .h = 24, .fill = true};
     gl_draw_rect(fb, _my_bg2, &bar);
-    term_render(term, fb, _my_fg, term_window.x + 16, term_window.y + 16);
-    display_commit(TTY_DISPLAY);
-}
-
-static void _ttyout(u8 ch) { term_write(term, ch); }
-
-void kern_init_tty()
-{
-    u64 error = 0;
-    if ((error = display_acquire(&fb, TTY_DISPLAY))) {
-        debug_err("Failed to get display %d (Error %X)", TTY_DISPLAY, error);
-        panic(__FILE__ ": Failed to acquire display");
-    };
-    term = malloc(sizeof(Terminal_t));
-    if ((error = term_init(term, fb->width - 64, fb->height - 88)) != RESULT_SUCCESS) {
-        debug_err("Failed to initialize terminal (Error %X)", TTY_DISPLAY,
-                  error);
-        panic(__FILE__ ": Failed to initialize terminal.");
-    }
     debug_setup_tty_out(&kern_render_tty, &_ttyout);
     kern_render_tty();
+    display_commit(fb->display_n);
 }
 
 void kern_handle_interrupt()
