@@ -28,7 +28,7 @@ char us_qwerty_low[256] = US_QWERTY_LOWERCASE;
 bool shift_down = false;
 extern u8 ps2_kbd_scancode_cmd(u8 subcommand);
 
-void process_keyboard_event(u8 scancode)
+char process_keyboard_event(u8 scancode)
 {
     char ch = shift_down ? us_qwerty[scancode] : us_qwerty_low[scancode];
     if (scancode == 0x3D) { debug_print_vm_stats(); }
@@ -36,13 +36,8 @@ void process_keyboard_event(u8 scancode)
         shift_down = true;
     } else if (scancode == 0xAA || scancode == 0xB6) {
         shift_down = false;
-    } else if (ch != '\0') {
-        if (ch == '\b') {
-            debug_printf("\b \b");
-            return;
-        }
-        debug_printf("%c", ch);
     }
+    return ch;
 }
 
 void keyboard_interrupt(u8 scancode)

@@ -6,6 +6,8 @@
 #include "lock.h"
 #include "string.h"
 
+#define printable(ch) ch < 32 || ch > 126
+
 u64 term_init(Terminal_t *term, usize width_px, usize height_px)
 {
     usize width = width_px / TTY_CHAR_WIDTH;
@@ -27,32 +29,59 @@ u64 term_init(Terminal_t *term, usize width_px, usize height_px)
     return RESULT_SUCCESS;
 }
 
-void term_write(Terminal_t *term, u8 ch) {
+void term_write(Terminal_t *term, u8 ch)
+{
     // defensive check
-    if(term->cursor_pos >= term->total_chars) term->cursor_pos = 0;
-    
+    if (term->cursor_pos >= term->total_chars) { term->cursor_pos = 0; }
+
     _no_interrupts
-    
-    if(ch == '\n') {
+
+        switch (ch)
+    {
+    case '\n':
         term->cursor_pos = term->width * (term->cursor_pos / term->width + 1);
-        return;
+        break;
+
+    case '\t':
+        term->cursor_pos += 4;
+        break;
+
+    case '\b':
+        term->cursor_pos--;
+        break;
+
+    case '\r':
+        term->cursor_pos = term->width * (term->cursor_pos / term->width);
+        break;
+
+    default:
+        // we don't care about all control sequences yet
+        term->chars[term->cursor_pos] = ch;
+        term->cursor_pos++;
+        break;
     }
 
-    // we don't care about control sequences yet
-    term->chars[term->cursor_pos] = ch;
-    term->cursor_pos++;
-
-    if(term->cursor_pos >= term->total_chars) term->cursor_pos = 0;
+    if (term->cursor_pos >= term->total_chars) { term->cursor_pos = 0; }
 }
 
-
-void term_render(Terminal_t *term, framebuffer_t *fb, u32 fg, usize fb_x, usize fb_y) {
-    for(usize y = 0; y < term->height; y++) {
-        for(usize x = 0; x < term->width; x++) {
+void term_render(Terminal_t *term, framebuffer_t *fb, u32 fg, usize fb_x,
+                 usize fb_y)
+{
+    for (usize y = 0; y < term->height; y++) {
+        for (usize x = 0; x < term->width; x++) {
             u8 ch = term->chars[y * term->width + x];
-            if(ch < 32 || ch > 126) continue;
-            gl_draw_char(fb, fg, fb_x + x * TTY_CHAR_WIDTH, fb_y + y * TTY_CHAR_HEIGHT, ch);
+            if (printable(ch)) { continue; }
+            gl_draw_char(fb, fg, fb_x + x * TTY_CHAR_WIDTH,
+                         fb_y + y * TTY_CHAR_HEIGHT, ch);
         }
     }
+    usize cursor_x = term->cursor_pos % term->width;
+    usize cursor_y = term->cursor_pos / term->width;
+    u8 char_under_cursor = term->chars[cursor_y * term->width + cursor_x];
+    Rect_t cursor_rect = {.x = fb_x + cursor_x * TTY_CHAR_WIDTH,
+                          .y = fb_y + cursor_y * TTY_CHAR_HEIGHT,
+                          .w = TTY_CHAR_WIDTH,
+                          .h = TTY_CHAR_HEIGHT,
+                          .fill = (printable(char_under_cursor))};
+    gl_draw_rect(fb, fg, &cursor_rect);
 }
-

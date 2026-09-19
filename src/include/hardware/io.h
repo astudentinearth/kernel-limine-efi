@@ -13,6 +13,7 @@ typedef struct {
 #define NOOP 0
 #define KEYBOARD_INT 1
 
-void process_keyboard_event(u8 scancode);
+char process_keyboard_event(u8 scancode);
 void queue_interrupt(kinterrupt_t interrupt);
 void kern_handle_interrupt();
+void kern_init_tty();
