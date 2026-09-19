@@ -54,19 +54,13 @@ void kern_init_tty()
     u64 error;
     if ((error = display_acquire(&fb, TTY_DISPLAY))) {
         debug_err("Failed to get display %d (Error %X)", TTY_DISPLAY, error);
-        panic("Failed to acquire display");
+        panic(__FILE__  ": Failed to acquire display");
     };
     term = malloc(sizeof(Terminal_t));
-    term_init(term, fb->width - 64, fb->height - 88);
-    const char *message =
-        "#include <stdio.h>\n\nint main(void) {\n  printf(\"I just riced my "
-        "own operating system lmao\\n\");\n  return 0;\n}";
-    u8 *_cur = message;
-
-    while (*_cur != 0) {
-        term_write(term, *_cur++);
+    if((error =term_init(term, fb->width - 64, fb->height - 88))) {
+        debug_err("Failed to initialize terminal (Error %X)", TTY_DISPLAY, error);
+        panic(__FILE__ ": Failed to initialize terminal.");
     }
-
     kern_render_tty();
 }
 

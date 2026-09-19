@@ -10,6 +10,7 @@
 
 u64 term_init(Terminal_t *term, usize width_px, usize height_px)
 {
+    if(width_px < TTY_CHAR_WIDTH || width_px > TTY_CHAR_HEIGHT) return EINVAL;
     usize width = width_px / TTY_CHAR_WIDTH;
     usize height = height_px / TTY_CHAR_HEIGHT;
     usize total_chars = width * height;
@@ -47,7 +48,7 @@ void term_write(Terminal_t *term, u8 ch)
         break;
 
     case '\b':
-        term->cursor_pos--;
+        if(term->cursor_pos > 0) term->cursor_pos--;
         break;
 
     case '\r':
