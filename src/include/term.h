@@ -2,6 +2,9 @@
 #include "gfx.h"
 #include "hardware/display.h"
 #include "stdint.h"
+
+// shorthand string literal macros
+
 #define FG_BLACK "\x1b[30m"
 #define FG_RED "\x1b[31m"
 #define FG_GREEN "\x1b[32m"
@@ -24,8 +27,77 @@
 #define BG_WHITE "\x1b[47m"
 #define BG_DEFAULT "\x1b[49m"
 
+// color codes
+
+#define tty_color_idx(color) color - 30
+typedef u64 TTYColorScheme_t[20];
+
+extern const TTYColorScheme_t TTY_DEFAULT_COLORS;
+
+typedef enum __TerminalForegroundColor_t {
+    TTY_FG_BLACK = 30,
+    TTY_FG_RED = 31,
+    TTY_FG_GREEN = 32,
+    TTY_FG_YELLOW = 33,
+    TTY_FG_BLUE = 34,
+    TTY_FG_MAGENTA = 35,
+    TTY_FG_CYAN = 36,
+    TTY_FG_WHITE = 37,
+    TTY_FG_DEFAULT = 39
+} TerminalFgColor_t;
+
+
+typedef enum __TerminalBackgroundColor_t {
+    TTY_BG_BLACK = 40,
+    TTY_BG_RED = 41,
+    TTY_BG_GREEN = 42,
+    TTY_BG_YELLOW = 43,
+    TTY_BG_BLUE = 44,
+    TTY_BG_MAGENTA = 45,
+    TTY_BG_CYAN = 46,
+    TTY_BG_WHITE = 47,
+    TTY_BG_DEFAULT = 49
+} TerminalBgColor_t;
+
+// control sequences
+
+#define TERM_ESC '\x1b'
+#define ESC_CURSOR_MOVE_UP 'A'
+#define ESC_CURSOR_MOVE_DOWN 'B'
+#define ESC_CURSOR_RIGHT 'C'
+#define ESC_CURSOR_LEFT 'D'
+#define ESC_CURSOR_MOVE_DOWN_LINES 'E'
+#define ESC_CURSOR_MOVE_UP_LINES 'F'
+#define ESC_CURSOR_MOVE_TO_COL 'G'
+#define ESC_CURSOR_HOME 'H'
+#define ESC_SET_COLOR 'm'
+
 #define TTY_CHAR_WIDTH 8
 #define TTY_CHAR_HEIGHT 16
+
+#define TTY_CH_DIRTY 0x1
+
+#define TTY_CSI_MAX_DIGITS 5
+
+typedef struct __CSIState_t {
+    bool in_sequence;
+    u16 parameters[8];
+    char current_number[TTY_CSI_MAX_DIGITS + 1];
+} CSIState_t;
+
+typedef struct __TermColorState_t {
+    const TTYColorScheme_t *colors;
+    TerminalBgColor_t bg_color;
+    TerminalFgColor_t fg_color;
+} TermColorState_t;
+
+typedef struct __TerminalRenderingContext_t {
+    framebuffer_t *fb;
+    usize width_px;
+    usize height_px;
+    usize x;
+    usize y;
+} TerminalRenderingContext_t;
 
 typedef struct __Terminal_t {
     usize width;
@@ -33,11 +105,15 @@ typedef struct __Terminal_t {
     usize cursor_pos;
     Rect_t last_rendered_cursor_rect;
     usize total_chars;
-    u32 bg_color;
     u8 *chars;
+    u8 *chars_bg;
+    u8 *chars_fg;
+    TermColorState_t color;
+    TerminalRenderingContext_t render;
+    CSIState_t csi;
 } Terminal_t;
 
-u64 term_init(Terminal_t *term, usize width_px, usize height_px, u32 bg_color);
+u64 term_init(Terminal_t *term, TerminalRenderingContext_t render, const TTYColorScheme_t *colors);
 void term_write(Terminal_t *term, u8 ch);
 
 void term_render(Terminal_t *term, framebuffer_t *fb, u32 fg, usize fb_x, usize fb_y);

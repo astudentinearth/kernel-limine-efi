@@ -30,10 +30,7 @@ void queue_interrupt(kinterrupt_t interrupt)
     head = next;
 }
 
-void kern_render_tty()
-{
-    term_render(term, fb, _my_fg, 32, 56);
-}
+void kern_render_tty() { term_render(term, fb, _my_fg, 32, 56); }
 
 static void _ttyout(u8 ch) { term_write(term, ch); }
 
@@ -45,8 +42,19 @@ void kern_init_tty()
         panic(__FILE__ ": Failed to acquire display");
     };
     term = malloc(sizeof(Terminal_t));
-    if ((error = term_init(term, fb->width - 64, fb->height - 88, _my_bg2)) !=
-        RESULT_SUCCESS) {
+
+    Rect_t term_window = {.x = 16,
+                          .y = 40,
+                          .w = fb->width - 32,
+                          .h = fb->height - 56,
+                          .fill = true};
+
+    TerminalRenderingContext_t ctx = {.x = term_window.x,
+                                      .y = term_window.y,
+                                      .width_px = term_window.w,
+                                      .height_px = term_window.h,
+                                      .fb = fb};
+    if ((error = term_init(term, ctx, &TTY_DEFAULT_COLORS)) != RESULT_SUCCESS) {
         debug_err("Failed to initialize terminal (Error %X)", TTY_DISPLAY,
                   error);
         panic(__FILE__ ": Failed to initialize terminal.");
@@ -55,12 +63,7 @@ void kern_init_tty()
     Line_t line = {
         .x = 0, .y = 24, .length = fb->width, .dir = DIRECTION_RIGHT};
     gl_draw_line(fb, _my_border, &line);
-    Rect_t term_window = {.x = 16,
-                          .y = 40,
-                          .w = fb->width - 32,
-                          .h = fb->height - 56,
-                          .fill = true};
-    gl_draw_rect(fb, _my_bg2, &term_window);
+    gl_draw_rect(fb, GL_COLOR_BLACK, &term_window);
     term_window.fill = false;
     gl_draw_rect(fb, _my_border, &term_window);
     Rect_t bar = {.x = 0, .y = 0, .w = fb->width, .h = 24, .fill = true};
