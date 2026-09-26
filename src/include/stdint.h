@@ -10,6 +10,11 @@ typedef signed long long i64;
 typedef u64 uptr;
 typedef u64 usize;
 
+#define U64_MAX 0xFFFFFFFFFFFFFFFF
+#define U32_MAX 0xFFFFFFFF
+#define U16_MAX 0xFFFF
+#define U8_MAX  0xFF
+
 // alises for backwards compatibility
 
 typedef u64 uint64_t;

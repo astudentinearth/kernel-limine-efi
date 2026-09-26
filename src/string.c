@@ -1,6 +1,7 @@
 #include "string.h"
 #include "ascii.h"
 #include "math.h"
+#include "result.h"
 
 void itoa(int64_t num, char *buf)
 {
@@ -100,4 +101,31 @@ bool str_equals(const char *a, const char *b)
         if (*a++ != *b++) { return false; }
     }
     return true;
+}
+
+#define __PARSE_UINT_MAX_DIGITS 20
+
+option_u64 parse_uint(const char *str)
+{
+    option_u64 _none = None(u64);
+
+    usize len = 0;
+    while (str[len] != 0) {
+        if (++len > __PARSE_UINT_MAX_DIGITS) {
+            return _none;
+        }
+    }
+
+    if (len == 0) { return _none; }
+
+    u64 result = 0;
+    for(usize i = 0; i < len; i++) {
+        u8 ch = str[i];
+        if(!is_digit(ch)) return _none;
+        u64 digit = ch - '0';
+        if(result > (U64_MAX - digit) / 10) return _none;
+        result = result * 10 + digit;
+    }
+
+    return Some(u64, result);
 }

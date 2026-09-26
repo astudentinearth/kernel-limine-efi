@@ -62,6 +62,7 @@ typedef enum __TerminalBackgroundColor_t {
 // control sequences
 
 #define TERM_ESC '\x1b'
+#define TERM_ESC_CSI '['
 #define ESC_CURSOR_MOVE_UP 'A'
 #define ESC_CURSOR_MOVE_DOWN 'B'
 #define ESC_CURSOR_RIGHT 'C'
@@ -71,6 +72,7 @@ typedef enum __TerminalBackgroundColor_t {
 #define ESC_CURSOR_MOVE_TO_COL 'G'
 #define ESC_CURSOR_HOME 'H'
 #define ESC_SET_COLOR 'm'
+#define ESC_TTY_RESET_COLORS 0
 
 #define TTY_CHAR_WIDTH 8
 #define TTY_CHAR_HEIGHT 16
@@ -79,10 +81,18 @@ typedef enum __TerminalBackgroundColor_t {
 
 #define TTY_CSI_MAX_DIGITS 5
 
+typedef enum __TerminalEscState {
+    TERM_NO_SEQ, TERM_IN_ESC, TERM_IN_CSI 
+} TerminalEscState_t;
+
+#define TTY_CSI_MAX_PARAMETERS 8
+
 typedef struct __CSIState_t {
-    bool in_sequence;
-    u16 parameters[8];
+    TerminalEscState_t state;
+    u16 parameters[TTY_CSI_MAX_PARAMETERS];
     char current_number[TTY_CSI_MAX_DIGITS + 1];
+    usize current_number_idx;
+    usize current_parameter_idx;
 } CSIState_t;
 
 typedef struct __TermColorState_t {

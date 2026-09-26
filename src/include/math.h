@@ -11,4 +11,4 @@ inline u64 upow(u64 val, unsigned exp) {
 
 #define max(a, b) a > b ? a : b
 #define min(a, b) a < b ? a : b
-
+#define is_digit(ch) (ch >= '0' && ch <= '9')
