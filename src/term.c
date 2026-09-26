@@ -129,10 +129,78 @@ static inline void term_render_cursor(Terminal_t *term)
                         char_rect.w, char_rect.h);
 }
 
+
+static inline void term_clear(Terminal_t *term) {
+    _no_interrupts
+    memset(term->chars, 0, term->total_chars * sizeof(u8));
+    memset(term->chars_bg, TTY_BG_DEFAULT, term->total_chars * sizeof(u8));
+    memset(term->chars_fg, TTY_FG_DEFAULT, term->total_chars * sizeof(u8));
+    Rect_t term_rect = {
+        .x = term->render.x,
+        .y = term->render.y,
+        .w = term->render.width_px,
+        .h = term->render.height_px,
+        .fill = true
+    };
+    gl_draw_rect(term->render.fb, get_color(term->color.colors, TTY_BG_DEFAULT), &term_rect);
+    display_commit_rect(term->render.fb->display_n, term_rect.x, term_rect.y, term_rect.w, term_rect.h);
+}
+
+static inline void term_scroll(Terminal_t *term, usize n) {
+    if(n == 0) return;
+    if(n >= term->height) {
+        term_clear(term);
+        return;
+    }
+
+    usize start_offset = n * term->width;
+    usize keep_chars = term->total_chars - start_offset;
+
+    _no_interrupts
+    // move character buffers
+    memmove(term->chars, term->chars + start_offset, term->total_chars - start_offset);
+    memmove(term->chars_bg, term->chars_bg + start_offset, term->total_chars - start_offset);
+    memmove(term->chars_fg, term->chars_fg + start_offset, term->total_chars - start_offset);
+
+    // clear lower lines
+    memset(term->chars + keep_chars, 0, term->total_chars - start_offset);
+    memset(term->chars_bg + keep_chars, TTY_BG_DEFAULT, start_offset);
+    memset(term->chars_fg + keep_chars, TTY_FG_DEFAULT, start_offset);
+
+    // scroll pixels
+    usize shift_px = n * TTY_CHAR_HEIGHT;
+    usize keep_px = (term->height - n) * TTY_CHAR_HEIGHT;
+
+    for(usize dy = 0; dy < keep_px; dy++) {
+        // framebuffer start + (term offset + dy) * y + x offset
+        u32 *dest = term->render.fb->pixels + (term->render.y + dy) * term->render.fb->width + term->render.x;
+        u32 *src = dest + shift_px * term->render.fb->width;
+
+        // move scanline
+        memmove(dest, src, term->render.width_px * sizeof(u32));
+    }
+
+    // clear lower pixels
+    Rect_t clear_rect = {
+        .x = term->render.x,
+        .y = term->render.y + keep_px,
+        .w = term->render.width_px,
+        .h = n * TTY_CHAR_HEIGHT,
+        .fill = true
+    };
+
+    gl_draw_rect(term->render.fb, get_color(term->color.colors, TTY_BG_DEFAULT), &clear_rect);
+
+    display_commit_rect(term->render.fb->display_n, term->render.x, term->render.y, term->render.width_px, term->render.height_px);
+}
+
 static inline void term_move_cursor(Terminal_t *term, usize new_pos)
 {
-    if (new_pos >= term->total_chars) { new_pos = 0; }
     term_render_pos(term, term->cursor_pos);
+    if (new_pos >= term->total_chars) { 
+        term_scroll(term, (new_pos - term->total_chars) / term->width + 1);
+        new_pos -= ((new_pos - term->total_chars) / term->width + 1) * term->width;
+    }
     {
         _no_interrupts term->cursor_pos = new_pos;
     }
@@ -167,6 +235,7 @@ static inline void term_csi_flush_param(Terminal_t *term)
     memset(term->csi.current_number, 0, TTY_CSI_MAX_DIGITS);
     term->csi.current_number_idx = 0;
 }
+
 
 static inline void term_reset_colors(Terminal_t *term) {
     term->color.bg_color = TTY_BG_DEFAULT;
@@ -254,38 +323,3 @@ void term_write(Terminal_t *term, u8 ch)
     }
 }
 
-void term_render(Terminal_t *term, framebuffer_t *fb, u32 fg, usize fb_x,
-                 usize fb_y)
-{
-    /*Rect_t original_cursor = term->las
-    gl_draw_rect(fb, (*term->color.colors)[tty_color_idx(term->color.bg_color)],
-                 &original_cursor);
-
-    Rect_t char_bg = {.w = TTY_CHAR_WIDTH,
-                      .h = TTY_CHAR_HEIGHT,
-                      .x = fb_x,
-                      .y = fb_y,
-                      .fill = true};
-    for (usize y = 0; y < term->height; y++) {
-        for (usize x = 0; x < term->width; x++) {
-            u8 ch = term->chars[y * term->width + x];
-            if (printable(ch)) { continue; }
-            char_bg.x = fb_x + x * TTY_CHAR_WIDTH;
-            char_bg.y = fb_y + y * TTY_CHAR_HEIGHT;
-            gl_draw_rect(fb, term->default_bg_argb, &char_bg);
-            gl_draw_char(fb, fg, fb_x + x * TTY_CHAR_WIDTH,
-                         fb_y + y * TTY_CHAR_HEIGHT, ch);
-            display_commit_rect(fb->display_n, char_bg.x, char_bg.y, char_bg.w,
-                                char_bg.h);
-        }
-    }
-
-    Rect_t cursor_rect = get_cursor_rect(term, fb_x, fb_y);
-    cursor_rect.fill = true;
-    term->last_rendered_cursor_rect = cursor_rect;
-    gl_draw_rect(fb, fg, &cursor_rect);
-    display_commit_rect(fb->display_n, cursor_rect.x, cursor_rect.y,
-                        cursor_rect.w, cursor_rect.h);
-    display_commit_rect(fb->display_n, original_cursor.x, original_cursor.y,
-                        original_cursor.w, original_cursor.h);*/
-}

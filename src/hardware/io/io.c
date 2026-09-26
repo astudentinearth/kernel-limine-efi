@@ -30,7 +30,7 @@ void queue_interrupt(kinterrupt_t interrupt)
     head = next;
 }
 
-void kern_render_tty() { term_render(term, fb, _my_fg, 32, 56); }
+void kern_render_tty() {  }
 
 static void _ttyout(u8 ch) { term_write(term, ch); }
 

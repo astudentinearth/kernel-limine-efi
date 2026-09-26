@@ -126,5 +126,5 @@ typedef struct __Terminal_t {
 u64 term_init(Terminal_t *term, TerminalRenderingContext_t render, const TTYColorScheme_t *colors);
 void term_write(Terminal_t *term, u8 ch);
 
-void term_render(Terminal_t *term, framebuffer_t *fb, u32 fg, usize fb_x, usize fb_y);
+
 

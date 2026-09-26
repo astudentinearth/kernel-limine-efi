@@ -1,5 +1,6 @@
 
 #include "idt.h"
+#include "string.h"
 #ifdef TEST_MODE
 #include "debug.h"
 #endif
@@ -48,14 +49,15 @@ void handle_interrupt_with_error_code(struct interrupt_frame *frame,
 {
 
 #ifdef TEST_MODE
+    debug_setup_tty_out(NULL, NULL);
     debug_puts("[!] Interrupt - code ");
     debug_put_hex(interrupt_code);
     debug_puts("\n");
     debug_puts("[!] Error code provided: ");
     debug_put_hex(error_code);
     debug_puts("\n");
-#endif
     dump_frame(frame);
+#endif
     for (;;) {
         __asm__ volatile("cli; hlt" ::: "memory");
     }

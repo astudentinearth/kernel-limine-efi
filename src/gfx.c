@@ -86,3 +86,5 @@ void gl_clear(framebuffer_t *fb, u32 color)
         fb->pixels[px] = color;
     }
 }
+
+
