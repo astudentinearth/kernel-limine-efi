@@ -118,8 +118,13 @@ static inline void term_render_pos(Terminal_t *term, usize pos)
 static inline void term_render_cursor(Terminal_t *term)
 {
     u32 fg = get_color(term->color.colors, TTY_FG_DEFAULT);
+    u32 char_color = get_color(term->color.colors, TTY_BG_DEFAULT);
     Rect_t char_rect = get_rect_for_pos(term, term->cursor_pos);
+    u8 char_under_cursor = term->chars[term->cursor_pos];
     gl_draw_rect(term->render.fb, fg, &char_rect);
+    if(printable(char_under_cursor)) {
+        gl_draw_char(term->render.fb, char_color, char_rect.x, char_rect.y, char_under_cursor);
+    }
     display_commit_rect(term->render.fb->display_n, char_rect.x, char_rect.y,
                         char_rect.w, char_rect.h);
 }
