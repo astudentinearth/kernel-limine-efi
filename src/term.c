@@ -36,6 +36,30 @@ const TTYColorScheme_t TTY_DEFAULT_COLORS = {
     GL_COLOR_BLACK,
 };
 
+const TTYColorScheme_t TTY_KANAGAWA_COLORS = {
+    0xFF1F1F28, //black
+    0xFFC34043 , //red
+    0xFF76946A , // green
+    0xFFDCA561 , // yellow
+    0xFF7E9CD8 , // blue
+    0xFF957FB8 , // magenta
+    0xFF6A9589 , // cyan
+    0xFFDCD7BA , // white
+    0x0  , // unused
+    0xFFDCD7BA , // white
+
+    0xFF1F1F28, //black
+    0xFFC34043 , //red
+    0xFF76946A , // green
+    0xFFDCA561 , // yellow
+    0xFF7E9CD8 , // blue
+    0xFF957FB8 , // magenta
+    0xFF6A9589 , // cyan
+    0xFFDCD7BA , // white
+    0x0  , // unused
+    0xFF1F1F28, //black
+};
+
 static inline u32 get_color(const TTYColorScheme_t *colors, u8 color)
 {
     return (*colors)[tty_color_idx(color)];

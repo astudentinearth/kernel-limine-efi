@@ -49,12 +49,12 @@ void kern_init_tty()
                           .h = fb->height - 56,
                           .fill = true};
 
-    TerminalRenderingContext_t ctx = {.x = term_window.x,
-                                      .y = term_window.y,
-                                      .width_px = term_window.w,
-                                      .height_px = term_window.h,
+    TerminalRenderingContext_t ctx = {.x = term_window.x + 16,
+                                      .y = term_window.y + 16,
+                                      .width_px = term_window.w - 32,
+                                      .height_px = term_window.h - 32,
                                       .fb = fb};
-    if ((error = term_init(term, ctx, &TTY_DEFAULT_COLORS)) != RESULT_SUCCESS) {
+    if ((error = term_init(term, ctx, &TTY_KANAGAWA_COLORS)) != RESULT_SUCCESS) {
         debug_err("Failed to initialize terminal (Error %X)", TTY_DISPLAY,
                   error);
         panic(__FILE__ ": Failed to initialize terminal.");
@@ -63,7 +63,7 @@ void kern_init_tty()
     Line_t line = {
         .x = 0, .y = 24, .length = fb->width, .dir = DIRECTION_RIGHT};
     gl_draw_line(fb, _my_border, &line);
-    gl_draw_rect(fb, GL_COLOR_BLACK, &term_window);
+    gl_draw_rect(fb, _my_bg2, &term_window);
     term_window.fill = false;
     gl_draw_rect(fb, _my_border, &term_window);
     Rect_t bar = {.x = 0, .y = 0, .w = fb->width, .h = 24, .fill = true};

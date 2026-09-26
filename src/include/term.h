@@ -33,6 +33,7 @@
 typedef u64 TTYColorScheme_t[20];
 
 extern const TTYColorScheme_t TTY_DEFAULT_COLORS;
+extern const TTYColorScheme_t TTY_KANAGAWA_COLORS;
 
 typedef enum __TerminalForegroundColor_t {
     TTY_FG_BLACK = 30,
